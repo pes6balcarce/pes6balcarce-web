@@ -1,35 +1,30 @@
-@import './base.css';
+/* 1. Variables de Color (Nuestra Paleta) */
+:root {
+  --color-fondo: #121212;
+  --color-superficie: #1e1e1e;
+  
+  /* CAMBIO: Reemplazamos el verde por el dorado del logo */
+  --color-primario: #E8B943; /* Este es el dorado/ocre de tu logo */
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  --color-texto-principal: #e0e0e0;
+  --color-texto-secundario: #a0a0a0;
+  --radio-borde: 8px;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+/* 2. Estilos Globales y Reset Básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+body {
+  font-family: 'Roboto', sans-serif; /* Aplicamos la fuente que importamos */
+  background-color: var(--color-fondo);
+  color: var(--color-texto-principal);
+  line-height: 1.6;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+h1, h2, h3 {
+  font-weight: 700; /* Hacemos los títulos más gruesos */
 }
