@@ -2,16 +2,16 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-// --- CÓDIGO SEGURO PARA PRODUCCIÓN ---
-// Este código lee las variables de entorno que configuraste en Vercel.
+// --- SOLUCIÓN DIRECTA PARA PRODUCCIÓN ---
+// Escribimos toda la configuración directamente para asegurar que funcione en Vercel.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_ID,
-  measurementId: import.meta.env.VITE_MEASUREMENT_ID
+  apiKey: "AIzaSyAXfKdc6dfdi0ZxV-aIMzi_cRD654asPU4",
+  authDomain: "pes6balcarce2026.firebaseapp.com",
+  projectId: "pes6balcarce2026",
+  storageBucket: "pes6balcarce2026.firebasestorage.app",
+  messagingSenderId: "896058552329",
+  appId: "1:896058552329:web:35790a6652671130c108d8",
+  measurementId: "G-KQ25EKH280"
 };
 // ------------------------------------
 
