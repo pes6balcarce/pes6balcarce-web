@@ -85,24 +85,26 @@ onMounted(cargarJugadores); // Cargar los jugadores cuando la página esté list
     <section class="widget">
       <h2>Lista de Jugadores (Estadísticas de Selección)</h2>
       <div v-if="cargando">Cargando jugadores...</div>
-      <table v-else>
-        <thead>
-          <tr>
-            <th>Nombre Completo</th>
-            <th>Equipo</th>
-            <th>Posición</th>
-            <th>Veces en el 11 Ideal</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="jugador in listaJugadores" :key="jugador.id">
-            <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
-            <td>{{ jugador.equipo }}</td>
-            <td>{{ jugador.posicion }}</td>
-            <td><strong>{{ jugador.vecesSeleccionado }}</strong></td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="table-container">
+        <table v-else>
+            <thead>
+            <tr>
+                <th>Nombre Completo</th>
+                <th>Equipo</th>
+                <th>Posición</th>
+                <th>Veces en el 11 Ideal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="jugador in listaJugadores" :key="jugador.id">
+                <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
+                <td>{{ jugador.equipo }}</td>
+                <td>{{ jugador.posicion }}</td>
+                <td><strong>{{ jugador.vecesSeleccionado }}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>
@@ -146,4 +148,13 @@ th, td {
 th { font-weight: bold; color: var(--color-primario); }
 tbody tr:hover { background-color: #2a2a2a; }
 td strong { font-size: 1.2rem; color: var(--color-primario); }
+.table-container {
+  overflow-x: auto; /* ¡Esta es la magia! Permite el scroll horizontal */
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  white-space: nowrap; /* Evita que el texto de las celdas se parta en varias líneas */
+}
 </style>

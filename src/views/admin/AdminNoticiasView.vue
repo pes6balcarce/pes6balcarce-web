@@ -83,26 +83,28 @@ onMounted(cargarNoticias);
     <section class="widget">
       <h2>Lista de Noticias Publicadas</h2>
       <div v-if="cargando">Cargando noticias...</div>
-      <table v-else>
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Fecha de Publicación</th>
-            <th>Likes</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="noticia in listaNoticias" :key="noticia.id">
-            <td>{{ noticia.titulo }}</td>
-            <td>{{ new Date(noticia.fecha.seconds * 1000).toLocaleDateString() }}</td>
-            <td>{{ noticia.likes || 0 }}</td>
-            <td>
-              <button @click="eliminarNoticia(noticia.id)" class="btn-eliminar">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="table-container">
+        <table v-else>
+            <thead>
+            <tr>
+                <th>Título</th>
+                <th>Fecha de Publicación</th>
+                <th>Likes</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="noticia in listaNoticias" :key="noticia.id">
+                <td>{{ noticia.titulo }}</td>
+                <td>{{ new Date(noticia.fecha.seconds * 1000).toLocaleDateString() }}</td>
+                <td>{{ noticia.likes || 0 }}</td>
+                <td>
+                <button @click="eliminarNoticia(noticia.id)" class="btn-eliminar">Eliminar</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>
@@ -127,5 +129,14 @@ th { color: var(--color-primario); }
 .btn-eliminar {
   padding: 0.4rem 0.8rem; background-color: #c53030; color: white;
   border: none; border-radius: var(--radio-borde); cursor: pointer;
+}
+.table-container {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  white-space: nowrap;
 }
 </style>

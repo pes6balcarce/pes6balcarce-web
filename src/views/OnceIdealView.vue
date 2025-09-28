@@ -154,16 +154,33 @@ const guardarAlineacion = async () => {
 .creador-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-top: 2rem; }
 .panel-jugadores, .panel-campo { background-color: var(--color-superficie); padding: 1.5rem; border-radius: var(--radio-borde); }
 h3 { margin-bottom: 1rem; }
-.filtros { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.filtros { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; } /* Cambiado a columna para móvil */
 .filtros input, .filtros select { width: 100%; padding: 0.5rem; background-color: var(--color-fondo); border: 1px solid var(--color-texto-secundario); color: var(--color-texto-principal); border-radius: 4px; }
 .lista-jugadores { list-style: none; max-height: 500px; overflow-y: auto; }
-.lista-jugadores li { display: flex; justify-content: space-between; padding: 0.8rem; border-bottom: 1px solid var(--color-fondo); cursor: pointer; }
+.lista-jugadores li { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; border-bottom: 1px solid var(--color-fondo); cursor: pointer; flex-wrap: wrap; } /* Añadido flex-wrap */
 .lista-jugadores li:hover { background-color: #2a2a2a; }
 .lista-jugadores li.disabled { cursor: not-allowed; opacity: 0.5; }
 .campo { background-color: #004d00; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23006600' fill-opacity='0.4'%3E%3Crect x='0' y='0' width='100' height='1px'/%3E%3C/g%3E%3C/svg%3E"); border: 2px solid white; padding: 1rem; border-radius: var(--radio-borde); height: 500px; display: flex; flex-direction: column; justify-content: space-around; }
 .fila-posicion { display: flex; justify-content: space-around; }
-.posicion { width: 60px; height: 60px; background-color: rgba(255,255,255,0.2); border: 1px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; color: white; cursor: pointer; }
+.posicion { width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border: 1px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; color: white; cursor: pointer; font-size: 0.8rem; }
 .posicion:not(.arquero) { background-color: rgba(232, 185, 67, 0.8); color: var(--color-fondo); }
 .posicion.arquero { background-color: rgba(50, 50, 50, 0.8); }
 .btn-guardar { width: 100%; padding: 1rem; background-color: var(--color-primario); color: var(--color-fondo); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1.2rem; margin-top: 1rem; }
+
+/* --- INICIO DE ESTILOS RESPONSIVE --- */
+@media (max-width: 992px) {
+  .creador-grid {
+    grid-template-columns: 1fr; /* Apila las columnas una encima de la otra */
+  }
+}
+
+@media (max-width: 480px) {
+  .posicion {
+    width: 40px;
+    height: 40px;
+    font-size: 0.7rem;
+  }
+  .panel-jugadores, .panel-campo { padding: 1rem; }
+}
+/* --- FIN DE ESTILOS RESPONSIVE --- */
 </style>

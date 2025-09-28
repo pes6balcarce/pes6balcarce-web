@@ -65,9 +65,30 @@ const cerrarSesion = async () => {
 header { background-color: var(--color-superficie); padding: 1rem 2rem; border-bottom: 2px solid var(--color-primario); }
 .wrapper { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
 .logo-img { height: 60px; width: auto; display: block; }
-nav a { color: var(--color-texto-principal); margin: 0 15px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: color 0.3s ease; }
+nav { display: flex; align-items: center; } /* Añadido para mejor alineación */
+nav a { color: var(--color-texto-principal); margin: 0 15px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: color 0.3s ease; white-space: nowrap; } /* Añadido nowrap */
 nav a:hover { color: var(--color-primario); }
 nav a.router-link-exact-active { color: var(--color-primario); }
 main { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
 footer { background-color: var(--color-superficie); color: var(--color-texto-secundario); text-align: center; padding: 1.5rem; margin-top: auto; }
+
+/* --- INICIO DE ESTILOS RESPONSIVE --- */
+/* Para pantallas de 768px o menos (tablets y celulares) */
+@media (max-width: 768px) {
+  header { padding: 1rem; }
+  .wrapper {
+    flex-direction: column; /* Apila el logo y la navegación verticalmente */
+    gap: 1rem;
+  }
+  nav {
+    flex-wrap: wrap; /* Permite que los enlaces pasen a la siguiente línea si no caben */
+    justify-content: center; /* Centra los enlaces */
+  }
+  nav a {
+    margin: 0 10px; /* Reduce el espacio entre enlaces */
+    font-size: 1rem;
+  }
+  main { padding: 1rem; }
+}
+/* --- FIN DE ESTILOS RESPONSIVE --- */
 </style>
