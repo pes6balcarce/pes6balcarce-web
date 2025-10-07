@@ -1,30 +1,52 @@
-/* 1. Variables de Color (Nuestra Paleta) */
-:root {
-  --color-fondo: #121212;
-  --color-superficie: #1e1e1e;
-  
-  /* CAMBIO: Reemplazamos el verde por el dorado del logo */
-  --color-primario: #E8B943; /* Este es el dorado/ocre de tu logo */
+/* src/assets/main.css */
 
-  --color-texto-principal: #e0e0e0;
-  --color-texto-secundario: #a0a0a0;
-  --radio-borde: 8px;
+/* 1. Paleta de Colores Inspirada en la App */
+:root {
+  --color-primario: #007bff; /* Un azul vibrante como el de BCNTurisme */
+  --color-fondo-app: #f4f4f9; /* Un gris muy claro para el fondo del contenido */
+  --color-superficie: #ffffff; /* Blanco para las tarjetas y elementos */
+  --color-texto-principal: #2c3e50; /* Un gris oscuro para el texto principal */
+  --color-texto-secundario: #6c757d; /* Un gris más claro para texto secundario */
+  --radio-borde: 12px;
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --header-height: 60px; /* Altura fija para la cabecera */
 }
 
-/* 2. Estilos Globales y Reset Básico */
+/* 2. Reset Básico y Estilos Globales */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: 'Roboto', sans-serif; /* Aplicamos la fuente que importamos */
-  background-color: var(--color-fondo);
-  color: var(--color-texto-principal);
-  line-height: 1.6;
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-h1, h2, h3 {
-  font-weight: 700; /* Hacemos los títulos más gruesos */
+body {
+  background-color: var(--color-fondo-app);
+  color: var(--color-texto-principal);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  /* Asegura que la app ocupe toda la pantalla y permita el scroll del contenido */
+  min-height: 100vh;
+  padding-top: var(
+    --header-height
+  ); /* MUY IMPORTANTE: Evita que el contenido se esconda debajo del header fijo */
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+a {
+  text-decoration: none;
+  color: var(--color-primario);
 }
