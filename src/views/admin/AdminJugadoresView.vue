@@ -1,160 +1,221 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore'
-import { db } from '@/firebase/config'
-
-// --- Lógica para AÑADIR jugadores ---
-const nuevoJugador = ref({
-  nombre: '',
-  apellido: '',
-  posicion: 'Arquero', // Valor por defecto
-  equipo: ''
-})
-const mensajeExito = ref('')
-
-const agregarJugador = async () => {
-  if (!nuevoJugador.value.nombre || !nuevoJugador.value.apellido || !nuevoJugador.value.equipo) {
-    alert('Todos los campos son obligatorios.');
-    return;
-  }
-  try {
-    await addDoc(collection(db, 'jugadores'), {
-      ...nuevoJugador.value,
-      vecesSeleccionado: 0 // La estadística empieza en 0
-    });
-    mensajeExito.value = `¡${nuevoJugador.value.nombre} ${nuevoJugador.value.apellido} añadido con éxito!`;
-    // Recargamos la lista de jugadores para ver el nuevo
-    cargarJugadores(); 
-    // Limpiamos el formulario
-    nuevoJugador.value = { nombre: '', apellido: '', posicion: 'Arquero', equipo: '' };
-    setTimeout(() => mensajeExito.value = '', 3000);
-  } catch (error) {
-    console.error("Error al añadir jugador:", error);
-    alert('Hubo un error al añadir el jugador.');
-  }
-}
-
-// --- Lógica para MOSTRAR jugadores y estadísticas ---
-const listaJugadores = ref([])
-const cargando = ref(true)
-
-const cargarJugadores = async () => {
-  cargando.value = true;
-  const q = query(collection(db, "jugadores"), orderBy("vecesSeleccionado", "desc"));
-  const querySnapshot = await getDocs(q);
-  listaJugadores.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  cargando.value = false;
-}
-
-onMounted(cargarJugadores); // Cargar los jugadores cuando la página esté lista
-</script>
-
+<!-- src/views/admin/AdminJugadoresView.vue -->
 <template>
-  <div>
-    <h1>Gestionar Jugadores y Estadísticas</h1>
-    
-    <section class="widget">
-      <h2>Añadir Nuevo Jugador</h2>
-      <form @submit.prevent="agregarJugador" class="form-grid">
-        <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" v-model="nuevoJugador.nombre">
-        </div>
-        <div class="form-group">
-          <label>Apellido</label>
-          <input type="text" v-model="nuevoJugador.apellido">
-        </div>
-        <div class="form-group">
-          <label>Posición</label>
-          <select v-model="nuevoJugador.posicion">
-            <option>Arquero</option>
-            <option>Defensor</option>
-            <option>Mediocampista</option>
-            <option>Delantero</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Equipo</label>
-          <input type="text" v-model="nuevoJugador.equipo">
-        </div>
-        <button type="submit" class="btn-principal span-full">Añadir Jugador</button>
-      </form>
-      <p v-if="mensajeExito" class="mensaje-exito">{{ mensajeExito }}</p>
-    </section>
+  <div class="admin-jugadores">
+    <h1>Gestión de Jugadores</h1>
 
-    <section class="widget">
-      <h2>Lista de Jugadores (Estadísticas de Selección)</h2>
+    <!-- Formulario para crear/editar jugador -->
+    <form @submit.prevent="guardarJugador" class="form-card">
+      <h2>{{ editando ? 'Editar Jugador' : 'Añadir Nuevo Jugador' }}</h2>
+
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" v-model="nuevoJugador.nombre" required />
+      </div>
+
+      <div class="form-group">
+        <label for="posicion">Posición</label>
+        <input type="text" v-model="nuevoJugador.posicion" required />
+      </div>
+
+      <div class="form-group">
+        <label for="numero">Número de Camiseta</label>
+        <input type="number" v-model.number="nuevoJugador.numero" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">{{ editando ? 'Actualizar Jugador' : 'Guardar Jugador' }}</button>
+        <button type="button" v-if="editando" @click="cancelarEdicion">Cancelar</button>
+      </div>
+    </form>
+
+    <!-- Lista de jugadores existentes -->
+    <div class="lista-jugadores">
+      <h2>Plantel Actual</h2>
+
+      <!-- AQUÍ ESTÁ LA CORRECCIÓN -->
       <div v-if="cargando">Cargando jugadores...</div>
+
+      <div v-else-if="jugadores.length === 0">No hay jugadores añadidos.</div>
+
+      <!-- El `v-else` principal está en este div -->
       <div v-else class="table-container">
-        <table v-else>
-            <thead>
+        <!-- La tabla ya NO necesita un v-else -->
+        <table>
+          <thead>
             <tr>
-                <th>Nombre Completo</th>
-                <th>Equipo</th>
-                <th>Posición</th>
-                <th>Veces en el 11 Ideal</th>
+              <th>Número</th>
+              <th>Nombre</th>
+              <th>Posición</th>
+              <th>Acciones</th>
             </tr>
-            </thead>
-            <tbody>
-            <tr v-for="jugador in listaJugadores" :key="jugador.id">
-                <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
-                <td>{{ jugador.equipo }}</td>
-                <td>{{ jugador.posicion }}</td>
-                <td><strong>{{ jugador.vecesSeleccionado }}</strong></td>
+          </thead>
+          <tbody>
+            <tr v-for="jugador in jugadores" :key="jugador.id">
+              <td>{{ jugador.numero }}</td>
+              <td>{{ jugador.nombre }}</td>
+              <td>{{ jugador.posicion }}</td>
+              <td class="acciones">
+                <button @click="editarJugador(jugador)">Editar</button>
+                <button @click="eliminarJugador(jugador.id)" class="btn-eliminar">Eliminar</button>
+              </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
       </div>
-    </section>
+      <!-- FIN DE LA CORRECCIÓN -->
+    </div>
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue'
+import { db } from '@/firebase/config'
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  query,
+  orderBy,
+} from 'firebase/firestore'
+
+const jugadores = ref([])
+const cargando = ref(true)
+const editando = ref(false)
+const jugadorId = ref(null)
+
+const nuevoJugador = ref({
+  nombre: '',
+  posicion: '',
+  numero: null,
+})
+
+// Obtener jugadores de Firestore
+const fetchJugadores = async () => {
+  cargando.value = true
+  const q = query(collection(db, 'jugadores'), orderBy('numero', 'asc'))
+  const querySnapshot = await getDocs(q)
+  jugadores.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+  cargando.value = false
+}
+
+onMounted(fetchJugadores)
+
+// Guardar o actualizar jugador
+const guardarJugador = async () => {
+  if (editando.value) {
+    const docRef = doc(db, 'jugadores', jugadorId.value)
+    await updateDoc(docRef, nuevoJugador.value)
+  } else {
+    await addDoc(collection(db, 'jugadores'), nuevoJugador.value)
+  }
+  resetForm()
+  await fetchJugadores()
+}
+
+const editarJugador = (jugador) => {
+  editando.value = true
+  jugadorId.value = jugador.id
+  nuevoJugador.value = { ...jugador }
+}
+
+const eliminarJugador = async (id) => {
+  if (confirm('¿Estás seguro de que quieres eliminar este jugador?')) {
+    await deleteDoc(doc(db, 'jugadores', id))
+    await fetchJugadores()
+  }
+}
+
+const resetForm = () => {
+  editando.value = false
+  jugadorId.value = null
+  nuevoJugador.value = { nombre: '', posicion: '', numero: null }
+}
+
+const cancelarEdicion = () => {
+  resetForm()
+}
+</script>
+
 <style scoped>
-.widget {
+/* Copiamos los estilos del otro panel para mantener la consistencia */
+.admin-jugadores {
+  color: var(--color-texto-principal);
+}
+
+.form-card,
+.lista-jugadores {
   background-color: var(--color-superficie);
   padding: 2rem;
   border-radius: var(--radio-borde);
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+input[type='text'],
+input[type='number'] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-fondo);
+  border: 1px solid #444;
+  border-radius: var(--radio-borde);
+  color: var(--color-texto-principal);
+}
+
+.form-actions {
+  display: flex;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
-.span-full {
-  grid-column: 1 / -1;
+
+button {
+  background-color: var(--color-primario);
+  color: #121212;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radio-borde);
+  cursor: pointer;
+  font-weight: bold;
 }
-.form-group { display: flex; flex-direction: column; }
-label { margin-bottom: 0.5rem; font-weight: bold; }
-input, select {
-  width: 100%; padding: 0.8rem; background-color: var(--color-fondo);
-  border: 1px solid var(--color-texto-secundario); color: var(--color-texto-principal); border-radius: 4px;
-}
-.btn-principal {
-  padding: 0.8rem; background-color: var(--color-primario); color: var(--color-fondo);
-  border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 1rem;
-}
-.mensaje-exito { color: var(--color-primario); margin-top: 1rem; text-align: center; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-th, td {
-  padding: 0.8rem;
-  text-align: left;
-  border-bottom: 1px solid var(--color-fondo);
-}
-th { font-weight: bold; color: var(--color-primario); }
-tbody tr:hover { background-color: #2a2a2a; }
-td strong { font-size: 1.2rem; color: var(--color-primario); }
+
 .table-container {
-  overflow-x: auto; /* ¡Esta es la magia! Permite el scroll horizontal */
+  overflow-x: auto;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  white-space: nowrap; /* Evita que el texto de las celdas se parta en varias líneas */
+}
+
+th,
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #444;
+  text-align: left;
+}
+
+th {
+  color: var(--color-primario);
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-eliminar {
+  background-color: #c0392b;
+  color: white;
 }
 </style>
