@@ -1,114 +1,115 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { collection, getDocs, query, orderBy } from 'firebase/firestore'
-import { db } from '../firebase/config' // Importamos nuestra conexión a la BD
-
-// Creamos una variable reactiva para guardar las noticias
-const noticias = ref([])
-const cargando = ref(true)
-
-// onMounted es un hook de Vue que se ejecuta cuando el componente está listo
-onMounted(async () => {
-  // 1. Creamos una consulta a nuestra colección 'noticias', ordenadas por fecha descendente
-  const q = query(collection(db, "noticias"), orderBy("fecha", "desc"));
-
-  // 2. Ejecutamos la consulta
-  const querySnapshot = await getDocs(q);
-
-  // 3. Recorremos los resultados y los guardamos en nuestra variable
-  querySnapshot.forEach((doc) => {
-    noticias.value.push({
-      id: doc.id,
-      ...doc.data()
-    });
-  });
-
-  cargando.value = false; // Dejamos de cargar
-})
-</script>
-
+<!-- src/views/NoticiasView.vue -->
 <template>
-  <div class="noticias">
-    <h2 class="titulo-seccion">Últimas Noticias</h2>
-    
-    <div v-if="cargando" class="mensaje-carga">Cargando noticias...</div>
-    
+  <div class="noticias-view">
+    <header class="page-header">
+      <h1>Noticias</h1>
+      <p>Todas las novedades sobre el parche y la comunidad.</p>
+    </header>
+
+    <div v-if="cargando" class="mensaje-central">Cargando noticias...</div>
+    <div v-else-if="noticias.length === 0" class="mensaje-central">No hay noticias publicadas.</div>
+
     <div v-else class="noticias-grid">
-      <!-- Envolvemos la tarjeta en un RouterLink -->
-      <RouterLink v-for="noticia in noticias" :key="noticia.id" :to="`/noticias/${noticia.id}`" class="tarjeta-link">
-        <article class="tarjeta-noticia">
-          <h3>{{ noticia.titulo }}</h3>
-          <p>{{ noticia.contenido }}</p>
-          <small>{{ new Date(noticia.fecha.seconds * 1000).toLocaleDateString() }}</small>
-        </article>
-      </RouterLink>
+      <!-- Usamos un <template> para poder insertar el banner entre las noticias sin romper la estructura -->
+      <template v-for="(noticia, index) in noticias" :key="noticia.id">
+        <!-- 1. Renderizamos la tarjeta de la noticia -->
+        <RouterLink :to="`/noticias/${noticia.id}`" class="noticia-card">
+          <div class="card-content">
+            <h2>{{ noticia.titulo }}</h2>
+            <p>{{ noticia.contenido.substring(0, 100) }}...</p>
+            <small>{{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}</small>
+          </div>
+        </RouterLink>
+
+        <!-- 2. Después de cada 2 noticias, insertamos un banner -->
+        <BannerPatrocinador v-if="(index + 1) % 2 === 0 && index < noticias.length - 1" />
+      </template>
     </div>
   </div>
 </template>
 
-<!-- SECCIÓN <style scoped> -->
+<script setup>
+import { ref, onMounted } from 'vue'
+import { db } from '@/firebase/config'
+import { collection, getDocs, query, orderBy } from 'firebase/firestore'
+// Importamos el componente del banner
+import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+
+const noticias = ref([])
+const cargando = ref(true)
+
+onMounted(async () => {
+  try {
+    const q = query(collection(db, 'noticias'), orderBy('creadoEn', 'desc'))
+    const querySnapshot = await getDocs(q)
+    noticias.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+  } catch (error) {
+    console.error('Error al obtener noticias:', error)
+  } finally {
+    cargando.value = false
+  }
+})
+</script>
+
 <style scoped>
-/* Añadimos un estilo para el enlace */
-.tarjeta-link {
-  text-decoration: none;
-  color: inherit;
+/* Estilos para que la vista de noticias se vea bien */
+.noticias-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.page-header h1 {
+  color: var(--color-primario);
+}
+.page-header p {
+  color: var(--color-texto-secundario);
+  font-size: 1.1rem;
+}
+.mensaje-central {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: var(--color-texto-secundario);
 }
 
 .noticias-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: 1fr; /* Una columna por defecto */
   gap: 1.5rem;
 }
 
-.titulo-seccion {
-  margin-bottom: 2rem;
-  text-align: center;
-  font-size: 2.5rem;
-  color: var(--color-primario);
-}
-
-article.tarjeta-noticia {
+.noticia-card {
   background-color: var(--color-superficie);
+  border: 1px solid #2a2a2a;
   border-radius: var(--radio-borde);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Hacemos que todas las tarjetas tengan la misma altura */
-  border: 1px solid transparent;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  text-decoration: none;
+  color: var(--color-texto-principal);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
-
-article.tarjeta-noticia:hover {
+.noticia-card:hover {
   transform: translateY(-5px);
   border-color: var(--color-primario);
 }
-
-.tarjeta-noticia h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1.4rem;
-  color: var(--color-texto-principal);
+.card-content {
+  padding: 1.5rem;
 }
-
-.tarjeta-noticia p {
-  flex-grow: 1;
-  margin-bottom: 1rem;
-  color: var(--color-texto-secundario);
-  /* Limitamos el texto a 3 líneas para que no se desborde */
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;  
-  overflow: hidden;
-}
-
-.tarjeta-noticia small {
+.card-content h2 {
+  margin-top: 0;
   color: var(--color-primario);
-  font-weight: bold;
-  align-self: flex-end;
 }
-
-.mensaje-carga {
-  text-align: center;
-  font-size: 1.2rem;
+.card-content p {
+  color: var(--color-texto-secundario);
+}
+.card-content small {
+  display: block;
+  margin-top: 1rem;
+  text-align: right;
   color: var(--color-texto-secundario);
 }
 </style>

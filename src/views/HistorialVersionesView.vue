@@ -7,33 +7,39 @@
       <RouterLink to="/descargas" class="btn-volver">&larr; Volver a la última versión</RouterLink>
     </header>
 
-    <div v-if="cargando" class="cargando-mensaje">Cargando historial...</div>
+    <div v-if="cargando" class="mensaje-central">Cargando historial...</div>
     <div v-else class="versiones-lista">
-      <div class="version-card" v-for="version in versiones" :key="version.id">
-        <div class="version-header">
-          <h3>{{ version.nombre }}</h3>
-          <small
-            >Publicado el:
-            {{ new Date(version.fechaPublicacion.seconds * 1000).toLocaleDateString() }}</small
-          >
+      <template v-for="(version, index) in versiones" :key="version.id">
+        <!-- 1. Renderizamos la tarjeta de la versión -->
+        <div class="version-card">
+          <div class="version-header">
+            <h3>{{ version.nombre }}</h3>
+            <small
+              >Publicado el:
+              {{ new Date(version.fechaPublicacion.seconds * 1000).toLocaleDateString() }}</small
+            >
+          </div>
+          <div class="version-body">
+            <h4>Novedades:</h4>
+            <ul class="changelog">
+              <li v-for="(item, index) in version.changelog" :key="index">{{ item }}</li>
+            </ul>
+          </div>
+          <div class="version-footer">
+            <a
+              :href="version.enlace"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-descarga btn-secundario"
+            >
+              Descargar esta versión
+            </a>
+          </div>
         </div>
-        <div class="version-body">
-          <h4>Novedades:</h4>
-          <ul class="changelog">
-            <li v-for="(item, index) in version.changelog" :key="index">{{ item }}</li>
-          </ul>
-        </div>
-        <div class="version-footer">
-          <a
-            :href="version.enlace"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn-descarga btn-secundario"
-          >
-            Descargar esta versión
-          </a>
-        </div>
-      </div>
+
+        <!-- 2. Insertamos un banner después de cada tarjeta (excepto la última) -->
+        <BannerPatrocinador v-if="index < versiones.length - 1" />
+      </template>
     </div>
   </div>
 </template>
@@ -42,6 +48,8 @@
 import { ref, onMounted } from 'vue'
 import { db } from '@/firebase/config'
 import { collection, getDocs, query, orderBy } from 'firebase/firestore'
+// Importamos el componente del banner
+import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
 
 const versiones = ref([])
 const cargando = ref(true)
@@ -60,7 +68,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Reutilizamos y adaptamos los estilos de la página de descargas */
+/* Los estilos de esta página no necesitan cambios */
 .historial-view {
   max-width: 800px;
   margin: 0 auto;
@@ -83,7 +91,7 @@ onMounted(async () => {
   color: var(--color-primario);
   text-decoration: none;
 }
-.cargando-mensaje {
+.mensaje-central {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
@@ -93,7 +101,10 @@ onMounted(async () => {
   background-color: var(--color-superficie);
   border: 1px solid #2a2a2a;
   border-radius: var(--radio-borde);
-  margin-bottom: 1.5rem;
+}
+/* Quitamos el margen inferior de la tarjeta para que el banner quede pegado */
+.versiones-lista > template > .version-card {
+  margin-bottom: 0;
 }
 .version-header {
   padding: 1rem 1.5rem;

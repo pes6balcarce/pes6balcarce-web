@@ -1,17 +1,19 @@
 <!-- src/views/DescargasView.vue -->
 <template>
   <div class="descargas-view">
-    <div v-if="cargando" class="cargando-mensaje">Buscando la última versión...</div>
-    <div v-else-if="!versionReciente" class="sin-versiones-mensaje">
-      Aún no se ha publicado ninguna versión. ¡Vuelve pronto!
+    <div v-if="cargando" class="mensaje-central">Buscando la última versión...</div>
+    <div v-else-if="!versionReciente" class="mensaje-central">
+      Aún no se ha publicado ninguna versión.
     </div>
 
-    <!-- Contenido principal que se muestra cuando ya cargó la versión -->
     <template v-else>
       <header class="page-header">
         <h1>Descarga la Versión Más Reciente</h1>
         <p>¡Aquí tienes la última actualización del parche lista para instalar!</p>
       </header>
+
+      <!-- BANNER SUPERIOR -->
+      <BannerPatrocinador />
 
       <div class="version-card version-mas-reciente">
         <div class="version-header">
@@ -35,16 +37,18 @@
             target="_blank"
             rel="noopener noreferrer"
             class="btn-descarga"
+            >Descargar Ahora</a
           >
-            Descargar Ahora
-          </a>
         </div>
       </div>
 
+      <!-- BANNER INFERIOR -->
+      <BannerPatrocinador />
+
       <div class="historial-link-container">
-        <RouterLink to="/descargas/historial" class="btn-historial">
-          Ver Historial de Versiones Anteriores
-        </RouterLink>
+        <RouterLink to="/descargas/historial" class="btn-historial"
+          >Ver Historial de Versiones Anteriores</RouterLink
+        >
       </div>
     </template>
   </div>
@@ -54,6 +58,8 @@
 import { ref, onMounted } from 'vue'
 import { db } from '@/firebase/config'
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+// Importamos el componente del banner
+import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
 
 const versionReciente = ref(null)
 const cargando = ref(true)
@@ -74,7 +80,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Estilos similares a los anteriores, pero enfocados en una sola versión */
+/* Los estilos de esta página no necesitan cambios */
 .descargas-view {
   max-width: 800px;
   margin: 0 auto;
@@ -91,8 +97,7 @@ onMounted(async () => {
   color: var(--color-texto-secundario);
   font-size: 1.1rem;
 }
-.cargando-mensaje,
-.sin-versiones-mensaje {
+.mensaje-central {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
