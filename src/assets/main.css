@@ -1,20 +1,18 @@
 /* src/assets/main.css */
 
-/* 1. Variables de Color (BASADAS EN TU LOGO) y Variables de Layout */
+/* 1. Variables de Color y Layout */
 :root {
   /* --- Tu Paleta de Colores de Marca --- */
-  --color-fondo: #121212; /* Negro/Gris muy oscuro del logo */
-  --color-superficie: #1e1e1e; /* Un gris un poco más claro para las tarjetas */
-
-  /* ¡EL CAMBIO MÁS IMPORTANTE! Usamos el dorado del logo como color de acento principal */
+  --color-fondo: #121212;
+  --color-superficie: #1e1e1e;
   --color-primario: #e8b943;
-
-  --color-texto-principal: #e0e0e0; /* Texto principal casi blanco para alta legibilidad */
-  --color-texto-secundario: #a0a0a0; /* Texto secundario más tenue */
-  --radio-borde: 8px; /* Bordes redondeados para las tarjetas */
+  --color-texto-principal: #e0e0e0;
+  --color-texto-secundario: #a0a0a0;
+  --radio-borde: 8px;
 
   /* --- Variables de Layout para la App --- */
-  --header-height: 60px; /* Altura para la barra de navegación superior */
+  --header-height: 60px;
+  --subheader-height: 50px; /* <-- NUEVA VARIABLE */
   --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -32,11 +30,11 @@ body {
   line-height: 1.6;
 }
 
-/* 3. Layout de la Aplicación con Header Fijo */
+/* 3. Layout de la Aplicación con Header y Subheader Fijos */
 #app {
   min-height: 100vh;
-  /* Creamos espacio en la parte superior para que el header fijo no tape el contenido */
-  padding-top: var(--header-height);
+  /* ¡CAMBIO IMPORTANTE! Calculamos el padding total sumando ambas alturas */
+  padding-top: calc(var(--header-height) + var(--subheader-height));
 }
 
 /* 4. Estilos para Títulos y Enlaces */
@@ -47,22 +45,19 @@ h4,
 h5,
 h6 {
   font-weight: 700;
-  /* Los títulos importantes pueden llevar el color de la marca */
   color: var(--color-primario);
 }
 
-/* Hacemos que h1 sea un poco más sutil */
 h1 {
   color: var(--color-texto-principal);
 }
 
 a {
   text-decoration: none;
-  color: var(--color-primario); /* Todos los enlaces serán dorados */
+  color: var(--color-primario);
   transition: filter 0.2s ease-in-out;
 }
 
 a:hover {
-  /* Hacemos que el color sea un poco más brillante al pasar el mouse */
   filter: brightness(1.2);
 }
