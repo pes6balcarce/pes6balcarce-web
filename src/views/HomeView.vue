@@ -1,7 +1,7 @@
 <!-- src/views/HomeView.vue -->
 <script setup>
-// 1. Importa el nuevo componente de patrocinadores
-import SeccionPatrocinadores from '@/components/SeccionPatrocinadores.vue'
+// 1. Importamos el nuevo componente de banner
+import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
 </script>
 
 <template>
@@ -15,6 +15,9 @@ import SeccionPatrocinadores from '@/components/SeccionPatrocinadores.vue'
         <p>Toda la información sobre el siguiente encuentro.</p>
       </div>
     </div>
+
+    <!-- AQUÍ INSERTAMOS EL PRIMER BANNER -->
+    <BannerPatrocinador />
 
     <!-- Grid de accesos rápidos -->
     <div class="quick-access-grid">
@@ -32,6 +35,9 @@ import SeccionPatrocinadores from '@/components/SeccionPatrocinadores.vue'
       </RouterLink>
     </div>
 
+    <!-- AQUÍ PODEMOS INSERTAR OTRO BANNER (mostrará uno diferente al azar) -->
+    <BannerPatrocinador />
+
     <!-- Lista de información -->
     <div class="card list-card">
       <div class="info-item">
@@ -44,17 +50,16 @@ import SeccionPatrocinadores from '@/components/SeccionPatrocinadores.vue'
       </div>
     </div>
 
-    <!-- 2. Añade la sección de patrocinadores aquí -->
-    <SeccionPatrocinadores />
+    <!-- 2. HEMOS ELIMINADO LA ANTIGUA SECCIÓN DE PATROCINADORES DE AQUÍ ABAJO -->
   </div>
 </template>
 
 <style scoped>
-/* Estos son los estilos que te di antes, los mantenemos */
+/* Estos son los estilos que ya teníamos, no cambian */
 .home-view {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.5rem; /* Este gap ahora solo aplica a los bloques de contenido */
 }
 
 .card {
