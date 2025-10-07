@@ -3,7 +3,7 @@
   <div class="admin-jugadores">
     <h1>Gestión de Jugadores</h1>
 
-    <!-- Formulario para crear/editar jugador -->
+    <!-- CAMBIO: Hemos añadido todos los campos a la estructura definitiva del formulario -->
     <form @submit.prevent="guardarJugador" class="form-card">
       <h2>{{ editando ? 'Editar Jugador' : 'Añadir Nuevo Jugador' }}</h2>
 
@@ -13,8 +13,18 @@
       </div>
 
       <div class="form-group">
+        <label for="apellido">Apellido</label>
+        <input type="text" v-model="nuevoJugador.apellido" required />
+      </div>
+
+      <div class="form-group">
         <label for="posicion">Posición</label>
         <input type="text" v-model="nuevoJugador.posicion" required />
+      </div>
+
+      <div class="form-group">
+        <label for="equipo">Equipo</label>
+        <input type="text" v-model="nuevoJugador.equipo" required />
       </div>
 
       <div class="form-group">
@@ -28,32 +38,28 @@
       </div>
     </form>
 
-    <!-- Lista de jugadores existentes -->
+    <!-- La lista de jugadores no cambia -->
     <div class="lista-jugadores">
       <h2>Plantel Actual</h2>
-
-      <!-- AQUÍ ESTÁ LA CORRECCIÓN -->
       <div v-if="cargando">Cargando jugadores...</div>
-
       <div v-else-if="jugadores.length === 0">No hay jugadores añadidos.</div>
-
-      <!-- El `v-else` principal está en este div -->
       <div v-else class="table-container">
-        <!-- La tabla ya NO necesita un v-else -->
         <table>
           <thead>
             <tr>
               <th>Número</th>
-              <th>Nombre</th>
+              <th>Nombre Completo</th>
               <th>Posición</th>
+              <th>Equipo</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="jugador in jugadores" :key="jugador.id">
               <td>{{ jugador.numero }}</td>
-              <td>{{ jugador.nombre }}</td>
+              <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
               <td>{{ jugador.posicion }}</td>
+              <td>{{ jugador.equipo }}</td>
               <td class="acciones">
                 <button @click="editarJugador(jugador)">Editar</button>
                 <button @click="eliminarJugador(jugador.id)" class="btn-eliminar">Eliminar</button>
@@ -62,7 +68,6 @@
           </tbody>
         </table>
       </div>
-      <!-- FIN DE LA CORRECCIÓN -->
     </div>
   </div>
 </template>
@@ -81,18 +86,23 @@ import {
   orderBy,
 } from 'firebase/firestore'
 
+// --- CAMBIO CLAVE: DEFINIMOS LA ESTRUCTURA POR DEFECTO ---
+const crearJugadorPorDefecto = () => ({
+  nombre: '',
+  apellido: '',
+  posicion: '',
+  equipo: '',
+  numero: null,
+  vecesSeleccionado: 0, // Lo inicializamos siempre en 0
+})
+
 const jugadores = ref([])
 const cargando = ref(true)
 const editando = ref(false)
 const jugadorId = ref(null)
+// Inicializamos el formulario con la estructura limpia
+const nuevoJugador = ref(crearJugadorPorDefecto())
 
-const nuevoJugador = ref({
-  nombre: '',
-  posicion: '',
-  numero: null,
-})
-
-// Obtener jugadores de Firestore
 const fetchJugadores = async () => {
   cargando.value = true
   const q = query(collection(db, 'jugadores'), orderBy('numero', 'asc'))
@@ -103,13 +113,23 @@ const fetchJugadores = async () => {
 
 onMounted(fetchJugadores)
 
-// Guardar o actualizar jugador
 const guardarJugador = async () => {
+  // Creamos un objeto limpio para enviar, asegurando que tenga la estructura correcta
+  const jugadorParaGuardar = {
+    nombre: nuevoJugador.value.nombre,
+    apellido: nuevoJugador.value.apellido,
+    posicion: nuevoJugador.value.posicion,
+    equipo: nuevoJugador.value.equipo,
+    numero: nuevoJugador.value.numero,
+    // Mantenemos el valor de vecesSeleccionado si estamos editando, o lo ponemos en 0 si es nuevo
+    vecesSeleccionado: nuevoJugador.value.vecesSeleccionado || 0,
+  }
+
   if (editando.value) {
     const docRef = doc(db, 'jugadores', jugadorId.value)
-    await updateDoc(docRef, nuevoJugador.value)
+    await updateDoc(docRef, jugadorParaGuardar)
   } else {
-    await addDoc(collection(db, 'jugadores'), nuevoJugador.value)
+    await addDoc(collection(db, 'jugadores'), jugadorParaGuardar)
   }
   resetForm()
   await fetchJugadores()
@@ -118,7 +138,8 @@ const guardarJugador = async () => {
 const editarJugador = (jugador) => {
   editando.value = true
   jugadorId.value = jugador.id
-  nuevoJugador.value = { ...jugador }
+  // Usamos la estructura por defecto para asegurarnos de que todos los campos existan en el formulario
+  nuevoJugador.value = { ...crearJugadorPorDefecto(), ...jugador }
 }
 
 const eliminarJugador = async (id) => {
@@ -131,7 +152,8 @@ const eliminarJugador = async (id) => {
 const resetForm = () => {
   editando.value = false
   jugadorId.value = null
-  nuevoJugador.value = { nombre: '', posicion: '', numero: null }
+  // Al resetear, SIEMPRE volvemos a la estructura limpia y por defecto
+  nuevoJugador.value = crearJugadorPorDefecto()
 }
 
 const cancelarEdicion = () => {
@@ -140,11 +162,10 @@ const cancelarEdicion = () => {
 </script>
 
 <style scoped>
-/* Copiamos los estilos del otro panel para mantener la consistencia */
+/* Los estilos no necesitan cambios, son genéricos */
 .admin-jugadores {
   color: var(--color-texto-principal);
 }
-
 .form-card,
 .lista-jugadores {
   background-color: var(--color-superficie);
@@ -152,17 +173,14 @@ const cancelarEdicion = () => {
   border-radius: var(--radio-borde);
   margin-top: 1.5rem;
 }
-
 .form-group {
   margin-bottom: 1rem;
 }
-
 label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
 }
-
 input[type='text'],
 input[type='number'] {
   width: 100%;
@@ -172,13 +190,11 @@ input[type='number'] {
   border-radius: var(--radio-borde);
   color: var(--color-texto-principal);
 }
-
 .form-actions {
   display: flex;
   gap: 1rem;
   margin-top: 1.5rem;
 }
-
 button {
   background-color: var(--color-primario);
   color: #121212;
@@ -188,32 +204,26 @@ button {
   cursor: pointer;
   font-weight: bold;
 }
-
 .table-container {
   overflow-x: auto;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
 }
-
 th,
 td {
   padding: 1rem;
   border-bottom: 1px solid #444;
   text-align: left;
 }
-
 th {
   color: var(--color-primario);
 }
-
 .acciones {
   display: flex;
   gap: 0.5rem;
 }
-
 .btn-eliminar {
   background-color: #c0392b;
   color: white;
