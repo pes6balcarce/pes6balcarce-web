@@ -8,7 +8,6 @@ import { auth } from '@/firebase/config'
 import HomeView from '../views/HomeView.vue'
 import NoticiasView from '../views/NoticiasView.vue'
 import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
-import OnceIdealView from '@/views/OnceIdealView.vue'
 import DescargasView from '@/views/DescargasView.vue'
 import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
 
@@ -40,7 +39,6 @@ const router = createRouter({
     },
     { path: '/noticias', name: 'noticias', component: NoticiasView },
     { path: '/noticias/:id', name: 'noticia-detalle', component: NoticiaDetalleView, props: true },
-    { path: '/once-ideal', name: 'once-ideal', component: OnceIdealView },
     { path: '/registro', name: 'registro', component: RegistroView },
     { path: '/login', name: 'login', component: LoginView },
     {

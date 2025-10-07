@@ -4,7 +4,6 @@
     <div class="nav-links">
       <RouterLink to="/" class="nav-link">Inicio</RouterLink>
       <RouterLink to="/noticias" class="nav-link">Noticias</RouterLink>
-      <RouterLink to="/once-ideal" class="nav-link">Once Ideal</RouterLink>
       <RouterLink to="/descargas" class="nav-link">Descargas</RouterLink>
     </div>
   </nav>

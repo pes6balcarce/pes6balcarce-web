@@ -27,10 +27,6 @@
       <aside class="sidebar-column">
         <h3>Accesos Rápidos</h3>
         <div class="quick-links">
-          <RouterLink to="/once-ideal" class="quick-link-card">
-            <h4>🏆 Once Ideal</h4>
-            <p>Vota por los mejores jugadores.</p>
-          </RouterLink>
           <RouterLink to="/descargas/historial" class="quick-link-card">
             <h4>📚 Historial</h4>
             <p>Revisa todas las versiones.</p>
