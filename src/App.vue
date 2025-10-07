@@ -2,24 +2,33 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
-import SubHeader from '@/components/SubHeader.vue' // 1. Importamos el nuevo subheader
+import SubHeader from '@/components/SubHeader.vue'
+import AppFooter from '@/components/AppFooter.vue' // 1. Importamos el nuevo footer
 </script>
 
 <template>
-  <AppHeader />
-  <SubHeader />
-  <!-- 2. Lo colocamos justo debajo del header principal -->
+  <div class="app-wrapper">
+    <AppHeader />
+    <SubHeader />
 
-  <main class="main-content">
-    <RouterView />
-  </main>
+    <main class="main-content">
+      <RouterView />
+    </main>
+
+    <AppFooter />
+    <!-- 2. Lo colocamos al final del layout -->
+  </div>
 </template>
 
 <style scoped>
-.main-content {
-  padding: 1.5rem 1rem; /* Añadimos un poco más de padding vertical */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-  max-width: 1200px;
-  margin: 0 auto;
+.main-content {
+  flex-grow: 1; /* Esto es clave: hace que el contenido principal ocupe el espacio disponible */
+  /* El padding ya no lo necesitamos aquí, lo manejaremos con la clase .page-container */
 }
 </style>
