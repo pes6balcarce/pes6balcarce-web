@@ -1,9 +1,10 @@
-console.log("--- DEBUGGING VERCEL ENV VARIABLES ---");
-console.log("Project ID recibido:", import.meta.env.VITE_PROJECT_ID);
-console.log("API Key recibida:", import.meta.env.VITE_API_KEY);
+// src/main.js
 
-// Importa tu configuración de Firebase aquí. Esto asegura que se inicialice.
-import '@/firebase/config';
+// 1. Eliminamos los console.log que leían las variables de entorno.
+// Ya no son necesarios porque la configuración está directamente en config.js.
+
+// 2. Importa tu configuración de Firebase. Esto asegura que se inicialice.
+import '@/firebase/config'
 
 import './assets/main.css'
 
