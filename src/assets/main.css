@@ -1,22 +1,24 @@
 /* src/assets/main.css */
 
-/* 1. Variables de Color y Layout */
+/* 1. Sistema de Diseño: Variables de Color y Layout */
 :root {
-  /* --- Tu Paleta de Colores de Marca --- */
-  --color-fondo: #121212;
-  --color-superficie: #1e1e1e;
-  --color-primario: #e8b943;
-  --color-texto-principal: #e0e0e0;
+  /* --- Paleta de Colores de Marca --- */
+  --color-fondo: #101010; /* Un negro aún más profundo */
+  --color-superficie: #1c1c1c; /* Un gris oscuro para las tarjetas */
+  --color-primario: #e8b943; /* Dorado de la marca */
+  --color-borde: #2a2a2a; /* Un color sutil para bordes y separadores */
+
+  --color-texto-principal: #f0f0f0; /* Un blanco roto, más suave a la vista */
   --color-texto-secundario: #a0a0a0;
+
   --radio-borde: 8px;
 
-  /* --- Variables de Layout para la App --- */
+  /* --- Variables de Layout --- */
   --header-height: 60px;
-  --subheader-height: 50px; /* <-- NUEVA VARIABLE */
-  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --subheader-height: 50px;
 }
 
-/* 2. Estilos Globales y Reset Básico */
+/* 2. Reset Básico y Tipografía Profesional */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -27,37 +29,50 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto-principal);
-  line-height: 1.6;
+  line-height: 1.7; /* Aumentamos el interlineado para mejor legibilidad */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 3. Layout de la Aplicación con Header y Subheader Fijos */
 #app {
   min-height: 100vh;
-  /* ¡CAMBIO IMPORTANTE! Calculamos el padding total sumando ambas alturas */
   padding-top: calc(var(--header-height) + var(--subheader-height));
 }
 
-/* 4. Estilos para Títulos y Enlaces */
+/* --- Escala de Tipografía --- */
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
+h4 {
   font-weight: 700;
-  color: var(--color-primario);
+  line-height: 1.3;
+  color: var(--color-texto-principal); /* Títulos principales en blanco */
+  letter-spacing: -0.5px; /* Detalle profesional */
 }
-
 h1 {
-  color: var(--color-texto-principal);
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 1.75rem;
+}
+h3 {
+  font-size: 1.25rem;
 }
 
+/* Los enlaces usarán el color primario para destacar */
 a {
   text-decoration: none;
   color: var(--color-primario);
-  transition: filter 0.2s ease-in-out;
+  transition: filter 0.2s ease;
 }
-
 a:hover {
   filter: brightness(1.2);
+}
+
+/* --- Contenedor Principal --- */
+/* Usaremos esta clase en nuestras vistas para unificar el padding */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
 }

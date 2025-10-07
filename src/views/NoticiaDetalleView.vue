@@ -1,186 +1,110 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { doc, getDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp, increment, arrayUnion } from 'firebase/firestore'
-import { auth, db } from '@/firebase/config'
-
-const props = defineProps({
-  id: String
-})
-
-const noticia = ref(null)
-const comentarios = ref([])
-const nuevoComentario = ref('')
-const cargando = ref(true)
-const haDadoLike = ref(false)
-
-onMounted(async () => {
-  const noticiaRef = doc(db, 'noticias', props.id)
-  const docSnap = await getDoc(noticiaRef)
-  if (docSnap.exists()) {
-    noticia.value = { id: docSnap.id, ...docSnap.data() }
-  }
-
-  const comentariosRef = collection(db, 'noticias', props.id, 'comentarios')
-  const q = query(comentariosRef, orderBy('fechaCreacion', 'asc'))
-  const querySnapshot = await getDocs(q)
-  comentarios.value = querySnapshot.docs.map(doc => doc.data())
-  
-  haDadoLike.value = localStorage.getItem(`like_${props.id}`) === 'true'
-
-  cargando.value = false
-})
-
-const darLike = async () => {
-  // ... (función darLike se queda igual)
-  if (haDadoLike.value) return;
-  const noticiaRef = doc(db, 'noticias', props.id);
-  await updateDoc(noticiaRef, { likes: increment(1) });
-  if (!noticia.value.likes) noticia.value.likes = 0;
-  noticia.value.likes++;
-  haDadoLike.value = true;
-  localStorage.setItem(`like_${props.id}`, 'true');
-}
-
-const agregarComentario = async () => {
-  if (nuevoComentario.value.trim() === '') return;
-
-  const user = auth.currentUser
-  const autor = user ? user.displayName : 'Usuario Desconocido' // <-- Usamos el nombre del usuario si está logueado
-
-  const comentarioData = {
-    texto: nuevoComentario.value,
-    autor: autor,
-    fechaCreacion: serverTimestamp()
-  }
-
-  const comentariosRef = collection(db, 'noticias', props.id, 'comentarios')
-  await addDoc(comentariosRef, comentarioData)
-  
-  // Si el usuario está logueado, intentamos darle la medalla "Primer Comentario"
-  if (user) {
-    const userDocRef = doc(db, 'users', user.uid);
-    // arrayUnion solo añade el elemento si no existe, evitando duplicados
-    await updateDoc(userDocRef, {
-      medals: arrayUnion("Medalla: Primer Comentario")
-    });
-  }
-
-  comentarios.value.push({ ...comentarioData, fechaCreacion: { toDate: () => new Date() } });
-  nuevoComentario.value = ''
-}
-</script>
-
+<!-- src/views/NoticiaDetalleView.vue -->
 <template>
-  <div v-if="cargando">Cargando noticia...</div>
-  <div v-else-if="noticia" class="noticia-detalle">
-    <h1>{{ noticia.titulo }}</h1>
-    <p class="fecha">{{ new Date(noticia.fecha.seconds * 1000).toLocaleDateString() }}</p>
-    <p class="contenido">{{ noticia.contenido }}</p>
+  <div class="noticia-detalle-view">
+    <div v-if="noticia" class="noticia-contenido">
+      <header class="noticia-header">
+        <h1>{{ noticia.titulo }}</h1>
+        <p class="fecha-publicacion">
+          Publicado el {{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}
+        </p>
+      </header>
 
-    <div class="acciones-sociales">
-      <button @click="darLike" :disabled="haDadoLike" class="like-btn">
-        👍 Like ({{ noticia.likes || 0 }})
-      </button>
-    </div>
+      <!-- CUERPO DE LA NOTICIA DINÁMICO CON BANNERS -->
+      <div class="noticia-cuerpo">
+        <!-- Iteramos sobre el array de párrafos que hemos creado -->
+        <template v-for="(parrafo, index) in parrafosConBanners" :key="index">
+          <!-- Renderizamos el párrafo de texto -->
+          <p v-html="parrafo"></p>
 
-    <hr>
-
-    <div class="seccion-comentarios">
-      <h3>Comentarios</h3>
-      <form @submit.prevent="agregarComentario" class="formulario-comentario">
-        <textarea v-model="nuevoComentario" placeholder="Escribe tu comentario..."></textarea>
-        <button type="submit">Enviar Comentario</button>
-      </form>
-      <div class="lista-comentarios">
-        <div v-for="(comentario, index) in comentarios" :key="index" class="comentario">
-          <p class="autor">{{ comentario.autor }}</p>
-          <p class="texto">{{ comentario.texto }}</p>
-          <p class="fecha-comentario">{{ comentario.fechaCreacion.toDate().toLocaleString() }}</p>
-        </div>
-        <p v-if="comentarios.length === 0">Aún no hay comentarios. ¡Sé el primero!</p>
+          <!-- Después de cada párrafo (excepto el último), insertamos un banner -->
+          <BannerPatrocinador v-if="index < parrafosConBanners.length - 1" />
+        </template>
       </div>
     </div>
 
-  </div>
-  <div v-else>
-    <p>No se encontró la noticia.</p>
+    <div v-else class="mensaje-carga">Cargando noticia...</div>
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { db } from '@/firebase/config'
+import { doc, getDoc } from 'firebase/firestore'
+// Importamos el componente de banner que ya tenemos
+import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+
+const noticia = ref(null)
+const route = useRoute()
+
+onMounted(async () => {
+  const noticiaId = route.params.id
+  try {
+    const docRef = doc(db, 'noticias', noticiaId)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      noticia.value = docSnap.data()
+    } else {
+      console.error('No se encontró la noticia!')
+    }
+  } catch (error) {
+    console.error('Error al obtener la noticia:', error)
+  }
+})
+
+// ¡AQUÍ ESTÁ LA NUEVA LÓGICA!
+// Usamos una propiedad computada para dividir el contenido en párrafos.
+const parrafosConBanners = computed(() => {
+  if (noticia.value && noticia.value.contenido) {
+    // 1. Dividimos el texto por dobles saltos de línea (que representan párrafos).
+    //    Usamos un filtro para eliminar párrafos vacíos si los hubiera.
+    return noticia.value.contenido.split('\n\n').filter((p) => p.trim() !== '')
+  }
+  // Si no hay contenido, devolvemos un array vacío.
+  return []
+})
+</script>
+
 <style scoped>
-.noticia-detalle h1 {
-  color: var(--color-primario);
-  margin-bottom: 0.5rem;
+.noticia-detalle-view {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
 }
-.fecha {
+
+.mensaje-carga {
+  text-align: center;
+  font-size: 1.5rem;
   color: var(--color-texto-secundario);
+  padding: 4rem 0;
+}
+
+.noticia-header {
+  text-align: center;
+  border-bottom: 2px solid var(--color-primario);
+  padding-bottom: 1.5rem;
   margin-bottom: 2rem;
 }
-.contenido {
-  line-height: 1.8;
-  white-space: pre-wrap; /* Respeta los saltos de línea del contenido */
-}
-.acciones-sociales {
-  margin: 2rem 0;
-}
-.like-btn {
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-primario);
-  color: var(--color-primario);
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.like-btn:disabled {
-  background-color: var(--color-primario);
-  color: var(--color-fondo);
-  cursor: not-allowed;
-}
-hr {
-  border-color: var(--color-superficie);
-}
-.seccion-comentarios {
-  margin-top: 2rem;
-}
-.formulario-comentario textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 0.8rem;
-  background-color: var(--color-fondo);
-  border: 1px solid var(--color-texto-secundario);
+
+.noticia-header h1 {
+  margin-bottom: 1rem;
   color: var(--color-texto-principal);
-  border-radius: var(--radio-borde);
-  margin-bottom: 1rem;
 }
-.formulario-comentario button {
-  padding: 0.7rem 1.5rem;
-  background-color: var(--color-primario);
-  color: var(--color-fondo);
-  border: none;
-  border-radius: var(--radio-borde);
-  cursor: pointer;
-  font-weight: bold;
-}
-.lista-comentarios {
-  margin-top: 2rem;
-}
-.comentario {
-  background-color: var(--color-superficie);
-  padding: 1rem;
-  border-radius: var(--radio-borde);
-  margin-bottom: 1rem;
-}
-.comentario .autor {
-  font-weight: bold;
-  color: var(--color-primario);
-}
-.comentario .texto {
-  margin: 0.5rem 0;
-}
-.comentario .fecha-comentario {
-  font-size: 0.8rem;
+
+.fecha-publicacion {
   color: var(--color-texto-secundario);
-  text-align: right;
+  font-style: italic;
+}
+
+.noticia-cuerpo {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: var(--color-texto-principal);
+}
+
+/* Estilos para los párrafos que renderizamos */
+.noticia-cuerpo :deep(p) {
+  margin: 0; /* Quitamos el margen por defecto del párrafo */
 }
 </style>

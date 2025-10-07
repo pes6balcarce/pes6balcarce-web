@@ -1,69 +1,163 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '@/firebase/config'
-
-const usuario = ref(null)
-const medallas = ref([])
-const cargando = ref(true)
-
-onMounted(async () => {
-  const user = auth.currentUser
-  if (user) {
-    // 1. Obtenemos la información básica del perfil de Auth
-    usuario.value = {
-      displayName: user.displayName,
-      email: user.email
-    }
-
-    // 2. Obtenemos los datos extra (medallas) desde nuestra colección 'users'
-    const userDocRef = doc(db, 'users', user.uid)
-    const docSnap = await getDoc(userDocRef)
-    if (docSnap.exists()) {
-      medallas.value = docSnap.data().medals
-    }
-  }
-  cargando.value = false
-})
-</script>
-
+<!-- src/views/PerfilView.vue -->
 <template>
-  <div>
-    <h1>Mi Perfil</h1>
-    <div v-if="cargando">Cargando perfil...</div>
-    <div v-else-if="usuario" class="perfil-container">
-      <p><strong>Nombre de Usuario:</strong> {{ usuario.displayName }}</p>
-      <p><strong>Email:</strong> {{ usuario.email }}</p>
+  <div class="perfil-view">
+    <div v-if="user" class="profile-card">
+      <header class="card-header">
+        <div class="avatar">
+          <!-- Mostramos la primera letra del email como avatar por defecto -->
+          <span>{{ user.email.charAt(0).toUpperCase() }}</span>
+        </div>
+        <h1>Mi Perfil</h1>
+      </header>
 
-      <section class="medallas-section">
-        <h2>Mis Medallas</h2>
-        <ul v-if="medallas.length > 0">
-          <li v-for="(medalla, index) in medallas" :key="index">🏆 {{ medalla }}</li>
-        </ul>
-        <p v-else>Aún no has ganado ninguna medalla. ¡Participa en la comunidad para conseguirlas!</p>
-      </section>
+      <div class="card-body">
+        <div class="info-item">
+          <span class="label">Email de la Cuenta</span>
+          <span class="value">{{ user.email }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Miembro Desde</span>
+          <!-- Mostramos la fecha de creación de la cuenta -->
+          <span class="value">{{ new Date(user.metadata.creationTime).toLocaleDateString() }}</span>
+        </div>
+        <!-- Aquí podrías añadir más información del perfil en el futuro -->
+      </div>
+
+      <footer class="card-footer">
+        <button @click="handleLogout" class="btn-logout">Cerrar Sesión</button>
+      </footer>
     </div>
+
+    <div v-else class="loading-message">Cargando perfil...</div>
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth } from '@/firebase/config'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+
+const user = ref(null)
+const router = useRouter()
+let unsubscribeAuth
+
+onMounted(() => {
+  // Escuchamos cambios para asegurarnos de que el usuario está cargado
+  unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+    user.value = currentUser
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribeAuth) {
+    unsubscribeAuth()
+  }
+})
+
+// --- LÓGICA PARA CERRAR SESIÓN ---
+const handleLogout = async () => {
+  try {
+    await signOut(auth)
+    // Redirigimos al usuario a la página de inicio después de cerrar sesión
+    router.push('/')
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error)
+    alert('Hubo un error al intentar cerrar sesión.')
+  }
+}
+</script>
+
 <style scoped>
-.perfil-container {
+.perfil-view {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 600px;
   background-color: var(--color-superficie);
-  padding: 2rem;
   border-radius: var(--radio-borde);
+  border: 1px solid #2a2a2a;
+  overflow: hidden;
+  box-shadow: var(--sombra-suave);
 }
-.medallas-section {
-  margin-top: 2rem;
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid #2a2a2a;
 }
-.medallas-section h2 {
-  color: var(--color-primario);
-  margin-bottom: 1rem;
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--color-primario);
+  color: #121212;
+  font-size: 3rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1.5rem auto;
+  border: 4px solid var(--color-superficie);
 }
-.medallas-section ul {
-  list-style: none;
+
+.card-header h1 {
+  margin: 0;
+  color: var(--color-texto-principal);
 }
-.medallas-section li {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+
+.card-body {
+  padding: 2rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--color-texto-secundario);
+  font-weight: bold;
+}
+
+.value {
+  color: var(--color-texto-principal);
+}
+
+.card-footer {
+  padding: 1.5rem;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.btn-logout {
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: var(--radio-borde);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-logout:hover {
+  background-color: #e74c3c;
+}
+
+.loading-message {
+  color: var(--color-texto-secundario);
+  font-size: 1.5rem;
 }
 </style>
