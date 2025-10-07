@@ -11,13 +11,14 @@
 
       <!-- CUERPO DE LA NOTICIA DINÁMICO CON BANNERS -->
       <div class="noticia-cuerpo">
-        <!-- Iteramos sobre el array de párrafos que hemos creado -->
-        <template v-for="(parrafo, index) in parrafosConBanners" :key="index">
-          <!-- Renderizamos el párrafo de texto -->
-          <p v-html="parrafo"></p>
+        <!-- Iteramos sobre los segmentos de texto que hemos creado -->
+        <template v-for="(segmento, index) in segmentosDeContenido" :key="index">
+          <!-- Renderizamos el segmento de texto -->
+          <!-- Usamos v-html para que los saltos de línea se conviertan en párrafos -->
+          <div v-html="formatearParrafos(segmento)"></div>
 
-          <!-- Después de cada párrafo (excepto el último), insertamos un banner -->
-          <BannerPatrocinador v-if="index < parrafosConBanners.length - 1" />
+          <!-- Si este no es el último segmento, insertamos un banner -->
+          <BannerPatrocinador v-if="index < segmentosDeContenido.length - 1" />
         </template>
       </div>
     </div>
@@ -31,7 +32,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { db } from '@/firebase/config'
 import { doc, getDoc } from 'firebase/firestore'
-// Importamos el componente de banner que ya tenemos
 import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
 
 const noticia = ref(null)
@@ -53,17 +53,28 @@ onMounted(async () => {
   }
 })
 
-// ¡AQUÍ ESTÁ LA NUEVA LÓGICA!
-// Usamos una propiedad computada para dividir el contenido en párrafos.
-const parrafosConBanners = computed(() => {
+// ¡NUEVA LÓGICA MEJORADA!
+const segmentosDeContenido = computed(() => {
   if (noticia.value && noticia.value.contenido) {
-    // 1. Dividimos el texto por dobles saltos de línea (que representan párrafos).
-    //    Usamos un filtro para eliminar párrafos vacíos si los hubiera.
-    return noticia.value.contenido.split('\n\n').filter((p) => p.trim() !== '')
+    // 1. Dividimos el contenido usando '...' como separador.
+    return noticia.value.contenido.split('...')
   }
-  // Si no hay contenido, devolvemos un array vacío.
   return []
 })
+
+// Nueva función para convertir los saltos de línea de cada segmento en párrafos HTML
+const formatearParrafos = (texto) => {
+  if (!texto) return ''
+  // 1. Quitamos espacios en blanco al principio y al final.
+  // 2. Dividimos por dobles saltos de línea para crear un array de párrafos.
+  // 3. Envolvemos cada elemento del array en etiquetas <p>.
+  // 4. Unimos todo de nuevo en un solo string HTML.
+  return texto
+    .trim()
+    .split(/\n\s*\n/) // Expresión regular que busca uno o más saltos de línea
+    .map((parrafo) => `<p>${parrafo.replace(/\n/g, '<br>')}</p>`) // Reemplaza saltos simples con <br>
+    .join('')
+}
 </script>
 
 <style scoped>
@@ -103,8 +114,8 @@ const parrafosConBanners = computed(() => {
   color: var(--color-texto-principal);
 }
 
-/* Estilos para los párrafos que renderizamos */
+/* Estilos para los párrafos generados por v-html */
 .noticia-cuerpo :deep(p) {
-  margin: 0; /* Quitamos el margen por defecto del párrafo */
+  margin-bottom: 1.5rem;
 }
 </style>
