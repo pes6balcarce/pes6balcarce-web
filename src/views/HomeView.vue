@@ -1,7 +1,7 @@
 <!-- src/views/HomeView.vue -->
 <template>
   <div>
-    <!-- SECCIÓN HERO -->
+    <!-- SECCIÓN HERO (Sin cambios) -->
     <section class="hero">
       <div class="hero-content">
         <h1 class="hero-title">Liga Balcarceña de Fútbol</h1>
@@ -16,20 +16,42 @@
     <div class="page-container home-content">
       <main class="main-column">
         <h3>Últimas Noticias</h3>
-        <!-- Aquí iría un loop de tus noticias más recientes -->
-        <div class="card">Contenido de la noticia...</div>
 
-        <BannerPatrocinador />
+        <!-- Lógica para mostrar noticias -->
+        <div v-if="cargandoNoticias" class="loading-state">Cargando noticias...</div>
+        <div v-else-if="ultimasNoticias.length === 0" class="empty-state">
+          No hay noticias para mostrar.
+        </div>
 
-        <div class="card">Contenido de la noticia...</div>
+        <template v-else>
+          <!-- Iteramos sobre las noticias y colocamos un banner entre cada una -->
+          <template v-for="(noticia, index) in ultimasNoticias" :key="noticia.id">
+            <!-- Tarjeta de Noticia -->
+            <RouterLink :to="`/noticias/${noticia.id}`" class="noticia-card-home">
+              <div class="card-content">
+                <h4>{{ noticia.titulo }}</h4>
+                <p>{{ noticia.contenido.substring(0, 120) }}...</p>
+                <small>{{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}</small>
+              </div>
+            </RouterLink>
+
+            <!-- Banner de Patrocinador -->
+            <BannerPatrocinador v-if="index < ultimasNoticias.length - 1" />
+          </template>
+        </template>
       </main>
 
       <aside class="sidebar-column">
         <h3>Accesos Rápidos</h3>
         <div class="quick-links">
+          <!-- Hemos eliminado el de "Once Ideal" como pediste -->
           <RouterLink to="/descargas/historial" class="quick-link-card">
-            <h4>📚 Historial</h4>
-            <p>Revisa todas las versiones.</p>
+            <h4>📚 Historial de Versiones</h4>
+            <p>Revisa todas las actualizaciones.</p>
+          </RouterLink>
+          <RouterLink to="/registro" class="quick-link-card">
+            <h4>👤 Crear Cuenta</h4>
+            <p>Únete a la comunidad del parche.</p>
           </RouterLink>
         </div>
       </aside>
@@ -38,27 +60,57 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { db } from '@/firebase/config'
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
 import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
-// Aquí podrías añadir lógica para cargar las últimas noticias si quieres
+
+// Variables reactivas para las noticias y el estado de carga
+const ultimasNoticias = ref([])
+const cargandoNoticias = ref(true)
+
+// onMounted se ejecuta cuando el componente se carga por primera vez
+onMounted(async () => {
+  try {
+    // 1. Creamos una consulta a la colección 'noticias'
+    const q = query(
+      collection(db, 'noticias'),
+      orderBy('creadoEn', 'desc'), // 2. Ordenamos por fecha de creación, descendente (más nuevas primero)
+      limit(3), // 3. Limitamos el resultado a solo 3 noticias
+    )
+
+    // 4. Ejecutamos la consulta
+    const querySnapshot = await getDocs(q)
+
+    // 5. Mapeamos los resultados y los guardamos en nuestra variable
+    ultimasNoticias.value = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+  } catch (error) {
+    console.error('Error al obtener las últimas noticias:', error)
+  } finally {
+    // 6. Indicamos que la carga ha terminado (incluso si hubo un error)
+    cargandoNoticias.value = false
+  }
+})
 </script>
 
 <style scoped>
-/* --- ESTILOS DE LA SECCIÓN HERO --- */
+/* --- Estilos de la Sección Hero y Generales (Sin cambios) --- */
 .hero {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  height: 60vh; /* Ocupa el 60% de la altura de la pantalla */
+  height: 60vh;
   padding: 2rem;
-  /* CAMBIA ESTA URL por una imagen de fondo espectacular de tu parche */
   background-image: url('https://via.placeholder.com/1920x1080/1c1c1c/E8B943?text=IMAGEN+DEL+JUEGO');
   background-size: cover;
   background-position: center;
   color: white;
 }
-/* Capa oscura sobre la imagen para que el texto sea legible */
 .hero::before {
   content: '';
   position: absolute;
@@ -69,7 +121,7 @@ import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
   background: linear-gradient(to top, rgba(16, 16, 16, 1), rgba(16, 16, 16, 0.3));
 }
 .hero-content {
-  position: relative; /* Para que esté por encima de la capa oscura */
+  position: relative;
   z-index: 1;
   max-width: 800px;
 }
@@ -94,7 +146,7 @@ import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
   background-color: var(--color-primario);
   color: #101010;
   font-weight: 700;
-  border-radius: 50px; /* Botón píldora */
+  border-radius: 50px;
   text-transform: uppercase;
   font-size: 1rem;
   transition:
@@ -105,20 +157,16 @@ import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
   transform: scale(1.05);
   box-shadow: 0 5px 20px rgba(232, 185, 67, 0.4);
 }
-
-/* --- ESTILOS DEL CONTENIDO PRINCIPAL --- */
 .home-content {
   display: grid;
-  grid-template-columns: 1fr; /* Una columna por defecto para móviles */
+  grid-template-columns: 1fr;
   gap: 2rem;
 }
 @media (min-width: 992px) {
-  /* En PC, dos columnas: 2/3 para el contenido, 1/3 para la barra lateral */
   .home-content {
     grid-template-columns: 2fr 1fr;
   }
 }
-
 .main-column h3,
 .sidebar-column h3 {
   margin-bottom: 1.5rem;
@@ -130,17 +178,7 @@ import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
   flex-direction: column;
   gap: 1.5rem;
 }
-
-/* Estilo unificado para las tarjetas */
-.card {
-  background-color: var(--color-superficie);
-  padding: 1.5rem;
-  border-radius: var(--radio-borde);
-  border: 1px solid var(--color-borde);
-}
-
-/* Nuevo diseño para los accesos rápidos */
-.quick-links {
+.sidebar-column .quick-links {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -165,5 +203,47 @@ import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
   margin: 0;
   font-size: 0.9rem;
   color: var(--color-texto-secundario);
+}
+
+/* --- NUEVOS ESTILOS PARA LAS TARJETAS DE NOTICIAS --- */
+.noticia-card-home {
+  display: block;
+  background-color: var(--color-superficie);
+  border-radius: var(--radio-borde);
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto-principal);
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+.noticia-card-home:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-primario);
+}
+.noticia-card-home .card-content {
+  padding: 1.5rem;
+}
+.noticia-card-home h4 {
+  margin: 0 0 0.75rem 0;
+  color: var(
+    --color-texto-principal
+  ); /* Título en blanco para diferenciar de los de la barra lateral */
+}
+.noticia-card-home p {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--color-texto-secundario);
+}
+.noticia-card-home small {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.loading-state,
+.empty-state {
+  color: var(--color-texto-secundario);
+  text-align: center;
+  padding: 2rem;
 }
 </style>
