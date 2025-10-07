@@ -1,150 +1,127 @@
 <!-- src/views/HomeView.vue -->
+<script setup>
+// 1. Importa el nuevo componente de patrocinadores
+import SeccionPatrocinadores from '@/components/SeccionPatrocinadores.vue'
+</script>
+
 <template>
   <div class="home-view">
-    <!-- Sección de Héroe (Imagen Principal) -->
-    <div class="hero-card">
-      <img
-        src="https://via.placeholder.com/600x300"
-        alt="Imagen principal del club"
-        class="hero-image"
-      />
-      <div class="hero-text">
-        <h2>Bienvenidos al Sitio Oficial</h2>
-        <p>Toda la información del fútbol de Balcarce.</p>
+    <!-- Tarjeta principal -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Próximo Partido</h2>
+      </div>
+      <div class="card-body">
+        <p>Toda la información sobre el siguiente encuentro.</p>
       </div>
     </div>
 
-    <!-- Sección de Accesos Rápidos (como los 3 botones de Barcelona) -->
+    <!-- Grid de accesos rápidos -->
     <div class="quick-access-grid">
       <RouterLink to="/noticias" class="access-card">
-        <span class="icon">📰</span>
+        <span>📰</span>
         <span>Noticias</span>
       </RouterLink>
       <RouterLink to="/once-ideal" class="access-card">
-        <span class="icon">🏆</span>
+        <span>🏆</span>
         <span>Once Ideal</span>
       </RouterLink>
       <RouterLink to="/perfil" class="access-card">
-        <span class="icon">👤</span>
+        <span>👤</span>
         <span>Mi Perfil</span>
       </RouterLink>
     </div>
 
-    <!-- Sección de Información (como la lista de la Sagrada Familia) -->
-    <div class="info-list">
+    <!-- Lista de información -->
+    <div class="card list-card">
       <div class="info-item">
-        <span class="icon">ℹ️</span>
-        <div class="item-text">
-          <h3>Puntos de Información</h3>
-          <p>Encuentra todo lo que necesitas saber.</p>
-        </div>
+        <h3>Puntos de Información</h3>
         <span class="arrow">></span>
       </div>
       <div class="info-item">
-        <span class="icon">📞</span>
-        <div class="item-text">
-          <h3>Teléfonos de Interés</h3>
-          <p>Contacta con nosotros fácilmente.</p>
-        </div>
+        <h3>Teléfonos de Interés</h3>
         <span class="arrow">></span>
       </div>
     </div>
+
+    <!-- 2. Añade la sección de patrocinadores aquí -->
+    <SeccionPatrocinadores />
   </div>
 </template>
 
 <style scoped>
+/* Estos son los estilos que te di antes, los mantenemos */
 .home-view {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Espacio entre secciones */
+  gap: 1.5rem;
 }
 
-/* Estilo para las tarjetas */
-.hero-card,
-.access-card,
-.info-list {
+.card {
   background-color: var(--color-superficie);
   border-radius: var(--radio-borde);
-  box-shadow: var(--sombra-suave);
-  overflow: hidden; /* Para que la imagen respete los bordes redondeados */
+  border: 1px solid #2a2a2a;
 }
-
-/* Tarjeta de Héroe */
-.hero-image {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.hero-text {
+.card-header {
   padding: 1rem;
+  border-bottom: 1px solid #2a2a2a;
+}
+.card-header h2 {
+  margin: 0;
+  color: var(--color-primario);
+}
+.card-body {
+  padding: 1rem;
+  color: var(--color-texto-secundario);
 }
 
-/* Grid de Accesos Rápidos */
 .quick-access-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 1rem;
-  padding: 1rem;
 }
 
 .access-card {
+  background-color: var(--color-superficie);
+  border: 1px solid #2a2a2a;
+  border-radius: var(--radio-borde);
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
   gap: 0.5rem;
-  text-align: center;
   font-weight: 600;
   color: var(--color-texto-principal);
-  border: 1px solid #eee;
-  border-radius: var(--radio-borde);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: background-color 0.2s ease;
 }
-
 .access-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  background-color: #2c2c2c;
 }
-
-.access-card .icon {
+.access-card span:first-child {
   font-size: 2rem;
-}
-
-/* Lista de Información */
-.info-list {
-  padding: 0.5rem 0;
 }
 
 .info-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
-  gap: 1rem;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 1rem;
+  border-bottom: 1px solid #2a2a2a;
+  color: var(--color-texto-principal);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 .info-item:last-child {
   border-bottom: none;
 }
-.info-item .icon {
-  font-size: 1.5rem;
+.info-item:hover {
+  background-color: #2c2c2c;
 }
-.item-text {
-  flex-grow: 1;
-}
-.item-text h3 {
+.info-item h3 {
+  margin: 0;
   font-size: 1rem;
-  margin: 0;
-}
-.item-text p {
-  font-size: 0.85rem;
-  color: var(--color-texto-secundario);
-  margin: 0;
 }
 .arrow {
-  font-size: 1.2rem;
-  color: #ccc;
+  color: var(--color-texto-secundario);
 }
 </style>
