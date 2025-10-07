@@ -1,52 +1,68 @@
 /* src/assets/main.css */
 
-/* 1. Paleta de Colores Inspirada en la App */
+/* 1. Variables de Color (BASADAS EN TU LOGO) y Variables de Layout */
 :root {
-  --color-primario: #007bff; /* Un azul vibrante como el de BCNTurisme */
-  --color-fondo-app: #f4f4f9; /* Un gris muy claro para el fondo del contenido */
-  --color-superficie: #ffffff; /* Blanco para las tarjetas y elementos */
-  --color-texto-principal: #2c3e50; /* Un gris oscuro para el texto principal */
-  --color-texto-secundario: #6c757d; /* Un gris más claro para texto secundario */
-  --radio-borde: 12px;
-  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --header-height: 60px; /* Altura fija para la cabecera */
+  /* --- Tu Paleta de Colores de Marca --- */
+  --color-fondo: #121212; /* Negro/Gris muy oscuro del logo */
+  --color-superficie: #1e1e1e; /* Un gris un poco más claro para las tarjetas */
+
+  /* ¡EL CAMBIO MÁS IMPORTANTE! Usamos el dorado del logo como color de acento principal */
+  --color-primario: #e8b943;
+
+  --color-texto-principal: #e0e0e0; /* Texto principal casi blanco para alta legibilidad */
+  --color-texto-secundario: #a0a0a0; /* Texto secundario más tenue */
+  --radio-borde: 8px; /* Bordes redondeados para las tarjetas */
+
+  /* --- Variables de Layout para la App --- */
+  --header-height: 60px; /* Altura para la barra de navegación superior */
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* 2. Reset Básico y Estilos Globales */
+/* 2. Estilos Globales y Reset Básico */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
 body {
-  background-color: var(--color-fondo-app);
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--color-fondo);
   color: var(--color-texto-principal);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
+/* 3. Layout de la Aplicación con Header Fijo */
 #app {
-  /* Asegura que la app ocupe toda la pantalla y permita el scroll del contenido */
   min-height: 100vh;
-  padding-top: var(
-    --header-height
-  ); /* MUY IMPORTANTE: Evita que el contenido se esconda debajo del header fijo */
+  /* Creamos espacio en la parte superior para que el header fijo no tape el contenido */
+  padding-top: var(--header-height);
 }
 
+/* 4. Estilos para Títulos y Enlaces */
 h1,
 h2,
-h3 {
-  font-weight: 600;
-  margin-bottom: 0.5em;
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  /* Los títulos importantes pueden llevar el color de la marca */
+  color: var(--color-primario);
+}
+
+/* Hacemos que h1 sea un poco más sutil */
+h1 {
+  color: var(--color-texto-principal);
 }
 
 a {
   text-decoration: none;
-  color: var(--color-primario);
+  color: var(--color-primario); /* Todos los enlaces serán dorados */
+  transition: filter 0.2s ease-in-out;
+}
+
+a:hover {
+  /* Hacemos que el color sea un poco más brillante al pasar el mouse */
+  filter: brightness(1.2);
 }
