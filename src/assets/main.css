@@ -68,11 +68,3 @@ a {
 a:hover {
   filter: brightness(1.2);
 }
-
-/* --- Contenedor Principal --- */
-/* Usaremos esta clase en nuestras vistas para unificar el padding */
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-}

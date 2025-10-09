@@ -1,0 +1,411 @@
+📂 src
+  📄 App.vue
+  📄 estructura.txt
+    ---Código---
+    ---Fin Código---
+  📄 main.js
+    ---Código---
+    // src/main.js
+    
+    // 1. Eliminamos los console.log que leían las variables de entorno.
+    // Ya no son necesarios porque la configuración está directamente en config.js.
+    
+    // 2. Importa tu configuración de Firebase. Esto asegura que se inicialice.
+    import '@/firebase/config'
+    
+    import './assets/main.css'
+    
+    import { createApp } from 'vue'
+    import App from './App.vue'
+    import router from './router'
+    
+    const app = createApp(App)
+    
+    app.use(router)
+    
+    app.mount('#app')
+    ---Fin Código---
+  📂 assets
+    📄 base.css
+      ---Código---
+      /* color palette from <https://github.com/vuejs/theme> */
+      :root {
+        --vt-c-white: #ffffff;
+        --vt-c-white-soft: #f8f8f8;
+        --vt-c-white-mute: #f2f2f2;
+      
+        --vt-c-black: #181818;
+        --vt-c-black-soft: #222222;
+        --vt-c-black-mute: #282828;
+      
+        --vt-c-indigo: #2c3e50;
+      
+        --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+        --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+        --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+        --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+      
+        --vt-c-text-light-1: var(--vt-c-indigo);
+        --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+        --vt-c-text-dark-1: var(--vt-c-white);
+        --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+      }
+      
+      /* semantic color variables for this project */
+      :root {
+        --color-background: var(--vt-c-white);
+        --color-background-soft: var(--vt-c-white-soft);
+        --color-background-mute: var(--vt-c-white-mute);
+      
+        --color-border: var(--vt-c-divider-light-2);
+        --color-border-hover: var(--vt-c-divider-light-1);
+      
+        --color-heading: var(--vt-c-text-light-1);
+        --color-text: var(--vt-c-text-light-1);
+      
+        --section-gap: 160px;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-background: var(--vt-c-black);
+          --color-background-soft: var(--vt-c-black-soft);
+          --color-background-mute: var(--vt-c-black-mute);
+      
+          --color-border: var(--vt-c-divider-dark-2);
+          --color-border-hover: var(--vt-c-divider-dark-1);
+      
+          --color-heading: var(--vt-c-text-dark-1);
+          --color-text: var(--vt-c-text-dark-2);
+        }
+      }
+      
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        font-weight: normal;
+      }
+      
+      body {
+        min-height: 100vh;
+        color: var(--color-text);
+        background: var(--color-background);
+        transition:
+          color 0.5s,
+          background-color 0.5s;
+        line-height: 1.6;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Fira Sans',
+          'Droid Sans',
+          'Helvetica Neue',
+          sans-serif;
+        font-size: 15px;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      ---Fin Código---
+    📄 logo.svg
+    📄 main.css
+      ---Código---
+      /* src/assets/main.css */
+      
+      /* 1. Sistema de Diseño: Variables de Color y Layout */
+      :root {
+        /* --- Paleta de Colores de Marca --- */
+        --color-fondo: #101010; /* Un negro aún más profundo */
+        --color-superficie: #1c1c1c; /* Un gris oscuro para las tarjetas */
+        --color-primario: #e8b943; /* Dorado de la marca */
+        --color-borde: #2a2a2a; /* Un color sutil para bordes y separadores */
+      
+        --color-texto-principal: #f0f0f0; /* Un blanco roto, más suave a la vista */
+        --color-texto-secundario: #a0a0a0;
+      
+        --radio-borde: 8px;
+      
+        /* --- Variables de Layout --- */
+        --header-height: 60px;
+        --subheader-height: 50px;
+      }
+      
+      /* 2. Reset Básico y Tipografía Profesional */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--color-fondo);
+        color: var(--color-texto-principal);
+        line-height: 1.7; /* Aumentamos el interlineado para mejor legibilidad */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      #app {
+        min-height: 100vh;
+        padding-top: calc(var(--header-height) + var(--subheader-height));
+      }
+      
+      /* --- Escala de Tipografía --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--color-texto-principal); /* Títulos principales en blanco */
+        letter-spacing: -0.5px; /* Detalle profesional */
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+      h2 {
+        font-size: 1.75rem;
+      }
+      h3 {
+        font-size: 1.25rem;
+      }
+      
+      /* Los enlaces usarán el color primario para destacar */
+      a {
+        text-decoration: none;
+        color: var(--color-primario);
+        transition: filter 0.2s ease;
+      }
+      a:hover {
+        filter: brightness(1.2);
+      }
+      
+      /* --- Contenedor Principal --- */
+      /* Usaremos esta clase en nuestras vistas para unificar el padding */
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+      }
+      ---Fin Código---
+    📂 images
+      📄 logo.png
+    📂 patrocinadores
+      📄 CostiBarber.png
+  📂 components
+    📄 AppFooter.vue
+    📄 AppHeader.vue
+    📄 BannerPatrocinador.vue
+    📄 EncuestaActiva.vue
+    📄 SubHeader.vue
+    📂 icons
+      📄 IconCommunity.vue
+      📄 IconDocumentation.vue
+      📄 IconEcosystem.vue
+      📄 IconSupport.vue
+      📄 IconTooling.vue
+  📂 data
+    📄 patrocinadores.js
+      ---Código---
+      // src/data/patrocinadores.js
+      
+      // Para que esto funcione, primero debes colocar las imágenes
+      // dentro de la carpeta 'src/assets/patrocinadores/'
+      
+      // 1. Importa cada imagen que quieras usar
+      import CostiBarber from '@/assets/patrocinadores/CostiBarber.png'
+      // (cuando añadas un nuevo logo, impórtalo aquí)
+      
+      // 2. Crea y exporta el array de patrocinadores
+      export const listaPatrocinadores = [
+        {
+          id: 1,
+          nombre: 'CostiBarber',
+          enlace: 'https://www.instagram.com/costi.barberr',
+          imagen: CostiBarber, // Usa la variable importada
+        },
+        // Para añadir más, solo copia un bloque de arriba y pégalo aquí
+      ]
+      
+      // NOTA: Para este ejemplo, necesitarás tener 4 imágenes de ejemplo en
+      // tu carpeta 'src/assets/patrocinadores/' llamadas:
+      // - sponsor-a.png
+      ---Fin Código---
+  📂 firebase
+    📄 config.js
+      ---Código---
+      // src/firebase/config.js
+      
+      import { initializeApp } from 'firebase/app'
+      import { getFirestore } from 'firebase/firestore'
+      import { getAuth } from 'firebase/auth'
+      
+      // ¡ESTE ES EL ARCHIVO IMPORTANTE AHORA!
+      // La conexión a Firebase se establece aquí con estas claves.
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAXfKdc6dfdi0ZxV-aIMzi_cRD654asPU4',
+        authDomain: 'pes6balcarce2026.firebaseapp.com',
+        projectId: 'pes6balcarce2026',
+        storageBucket: 'pes6balcarce2026.appspot.com',
+        messagingSenderId: '896058552329',
+        appId: '1:896058552329:web:35790a6652671130c108d8',
+        measurementId: 'G-KQ25EKH280',
+      }
+      
+      const app = initializeApp(firebaseConfig)
+      const db = getFirestore(app)
+      const auth = getAuth(app)
+      
+      export { db, auth }
+      ---Fin Código---
+  📂 layouts
+    📄 AdminLayout.vue
+  📂 router
+    📄 index.js
+      ---Código---
+      // src/router/index.js
+      
+      import { createRouter, createWebHistory } from 'vue-router'
+      import { onAuthStateChanged } from 'firebase/auth'
+      import { auth } from '@/firebase/config'
+      
+      // Vistas Públicas
+      import HomeView from '../views/HomeView.vue'
+      import NoticiasView from '../views/NoticiasView.vue'
+      import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
+      import DescargasView from '@/views/DescargasView.vue'
+      import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
+      
+      // Vistas de Autenticación y Perfil de Usuario
+      import RegistroView from '@/views/RegistroView.vue'
+      import LoginView from '@/views/LoginView.vue'
+      import PerfilView from '@/views/PerfilView.vue'
+      
+      // Vistas y Layout del Admin
+      import AdminLayout from '@/layouts/AdminLayout.vue'
+      import AdminLoginView from '../views/admin/AdminLoginView.vue'
+      import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
+      import AdminEncuestasView from '@/views/admin/AdminEncuestasView.vue'
+      import AdminJugadoresView from '@/views/admin/AdminJugadoresView.vue'
+      import AdminNoticiasView from '@/views/admin/AdminNoticiasView.vue'
+      import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue' // <-- ESTA ES LA LÍNEA QUE FALTABA
+      import AdminVersionesView from '@/views/admin/AdminVersionesView.vue' // <-- Importación para la nueva vista de admin
+      
+      const router = createRouter({
+        history: createWebHistory(import.meta.env.BASE_URL),
+        routes: [
+          // --- Rutas Públicas y de Usuario ---
+          { path: '/', name: 'home', component: HomeView },
+          { path: '/descargas', name: 'descargas', component: DescargasView },
+          {
+            path: '/descargas/historial',
+            name: 'historial-versiones',
+            component: HistorialVersionesView,
+          },
+          { path: '/noticias', name: 'noticias', component: NoticiasView },
+          { path: '/noticias/:id', name: 'noticia-detalle', component: NoticiaDetalleView, props: true },
+          { path: '/registro', name: 'registro', component: RegistroView },
+          { path: '/login', name: 'login', component: LoginView },
+          {
+            path: '/perfil',
+            name: 'perfil',
+            component: PerfilView,
+            meta: { requiresAuth: true },
+          },
+      
+          // --- Rutas de Administración ---
+          { path: '/admin/login', name: 'admin-login', component: AdminLoginView },
+          {
+            path: '/admin',
+            component: AdminLayout,
+            meta: { requiresAuth: true },
+            children: [
+              { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboardView },
+              { path: 'encuestas', name: 'admin-encuestas', component: AdminEncuestasView },
+              { path: 'jugadores', name: 'admin-jugadores', component: AdminJugadoresView },
+              { path: 'noticias', name: 'admin-noticias', component: AdminNoticiasView },
+              {
+                path: 'patrocinadores',
+                name: 'admin-patrocinadores',
+                component: AdminPatrocinadoresView,
+              },
+              { path: 'versiones', name: 'admin-versiones', component: AdminVersionesView },
+            ],
+          },
+        ],
+      })
+      
+      // El guardián de rutas se queda exactamente igual
+      const getCurrentUser = () => {
+        return new Promise((resolve, reject) => {
+          const removeListener = onAuthStateChanged(
+            auth,
+            (user) => {
+              removeListener()
+              resolve(user)
+            },
+            reject,
+          )
+        })
+      }
+      
+      router.beforeEach(async (to, from, next) => {
+        const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+        const isAdminRoute = to.path.startsWith('/admin/')
+        const currentUser = await getCurrentUser()
+      
+        if (requiresAuth && !currentUser) {
+          if (isAdminRoute) {
+            next({ name: 'admin-login' })
+          } else {
+            next({ name: 'login' })
+          }
+        } else {
+          next()
+        }
+      })
+      
+      export default router
+      ---Fin Código---
+  📂 stores
+    📄 counter.js
+      ---Código---
+      import { ref, computed } from 'vue'
+      import { defineStore } from 'pinia'
+      
+      export const useCounterStore = defineStore('counter', () => {
+        const count = ref(0)
+        const doubleCount = computed(() => count.value * 2)
+        function increment() {
+          count.value++
+        }
+      
+        return { count, doubleCount, increment }
+      })
+      ---Fin Código---
+  📂 views
+    📄 DescargasView.vue
+    📄 HistorialVersionesView.vue
+    📄 HomeView.vue
+    📄 LoginView.vue
+    📄 NoticiaDetalleView.vue
+    📄 NoticiasView.vue
+    📄 PerfilView.vue
+    📄 RegistroView.vue
+    📂 admin
+      📄 AdminDashboardView.vue
+      📄 AdminEncuestasView.vue
+      📄 AdminJugadoresView.vue
+      📄 AdminLoginView.vue
+      📄 AdminNoticiasView.vue
+      📄 AdminPatrocinadoresView.vue
+      📄 AdminVersionesView.vue
