@@ -1,0 +1,4613 @@
+Estructura del proyecto en: C:/Users/fabia/OneDrive/Desktop/Nueva carpeta (3)/pes6balcarce-web/src
+========================================
+
+📂 src/
+  📄 App.vue
+    --- Contenido del Archivo ---
+    <template>
+      <div id="app-wrapper">
+        <!-- Cabecera y sub-cabecera fijas en la parte superior -->
+        <AppHeader />
+        <SubHeader />
+    
+        <!-- 
+          Este es el nuevo contenedor principal que utiliza CSS Grid.
+          Se divide en un área de contenido principal y una barra lateral derecha.
+        -->
+        <div class="main-layout-grid">
+          <!-- El contenido de la página actual (Home, Noticias, etc.) se renderiza aquí -->
+          <main class="main-content">
+            <RouterView />
+          </main>
+    
+          <!-- 
+            La barra lateral (sidebar) para el banner vertical.
+            Es semánticamente correcto usar la etiqueta <aside>.
+            Se mostrará u ocultará con CSS según el tamaño de la pantalla.
+          -->
+          <aside class="sidebar-right">
+            <BannerVertical />
+          </aside>
+        </div>
+    
+        <!-- 
+          El banner horizontal (leaderboard) se puede colocar después del contenido principal,
+          antes del pie de página.
+        -->
+        <BannerPatrocinador />
+    
+        <!-- Pie de página al final de todo -->
+        <AppFooter />
+      </div>
+    </template>
+    
+    <script setup>
+    // --- Importaciones Necesarias ---
+    // RouterView es esencial para que el sistema de rutas de Vue funcione.
+    import { RouterView } from 'vue-router'
+    
+    // Componentes del layout principal de la aplicación.
+    import AppHeader from '@/components/AppHeader.vue'
+    import SubHeader from '@/components/SubHeader.vue'
+    import AppFooter from '@/components/AppFooter.vue'
+    
+    // Componentes de publicidad.
+    import BannerPatrocinador from '@/components/BannerPatrocinador.vue' // Banner horizontal
+    import BannerVertical from '@/components/BannerVertical.vue' // Nuevo banner vertical
+    </script>
+    
+    <style scoped>
+    /* 
+      Estilos específicos para el layout de App.vue.
+      'scoped' asegura que estos estilos no afectarán a otros componentes.
+    */
+    
+    /* Contenedor global de la aplicación */
+    #app-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Asegura que el wrapper ocupe al menos toda la altura de la pantalla */
+    }
+    
+    /* El grid que define la estructura del contenido y la barra lateral */
+    .main-layout-grid {
+      display: grid;
+      width: 100%;
+      max-width: 1440px; /* Ancho máximo para mantener la legibilidad en pantallas muy grandes */
+      margin: 0 auto; /* Centra el layout en la página */
+      padding: 2rem 1.5rem; /* Espaciado interno */
+      gap: 2rem; /* Espacio entre el contenido y la barra lateral */
+      flex-grow: 1; /* Permite que este contenedor crezca para empujar el footer hacia abajo */
+    }
+    
+    /* --- ESTILOS PARA ESCRITORIO (Desktop First) --- */
+    
+    /* Por defecto, definimos 2 columnas: contenido flexible (1fr) y barra lateral de ancho fijo (214px) */
+    .main-layout-grid {
+      grid-template-columns: 1fr 214px;
+    }
+    
+    .main-content {
+      min-width: 0; /* Un truco de CSS para prevenir que elementos internos desborden el grid */
+    }
+    
+    .sidebar-right {
+      position: sticky; /* Fija la barra lateral para que no se pierda al hacer scroll */
+      /* Se alinea debajo de los headers. El '2rem' es por el padding del .main-layout-grid */
+      top: calc(var(--header-height) + var(--subheader-height) + 2rem);
+      height: fit-content; /* Necesario para que 'position: sticky' funcione correctamente */
+    }
+    
+    /* --- MEDIA QUERY PARA RESPONSIVE --- */
+    
+    /* Cuando la pantalla sea de 1024px o menos (tablets y móviles)... */
+    @media (max-width: 1024px) {
+      .main-layout-grid {
+        /* ...cambiamos el grid a una sola columna para que el contenido ocupe todo el ancho. */
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1rem; /* Reducimos un poco el padding en pantallas pequeñas */
+      }
+    
+      .sidebar-right {
+        /* ...y ocultamos completamente la barra lateral. */
+        display: none;
+      }
+    }
+    </style>
+    --- Fin del Contenido ---
+
+  📄 estructura.txt
+    --- Contenido del Archivo ---
+    📂 src
+      📄 App.vue
+      📄 estructura.txt
+        ---Código---
+        ---Fin Código---
+      📄 main.js
+        ---Código---
+        // src/main.js
+        
+        // 1. Eliminamos los console.log que leían las variables de entorno.
+        // Ya no son necesarios porque la configuración está directamente en config.js.
+        
+        // 2. Importa tu configuración de Firebase. Esto asegura que se inicialice.
+        import '@/firebase/config'
+        
+        import './assets/main.css'
+        
+        import { createApp } from 'vue'
+        import App from './App.vue'
+        import router from './router'
+        
+        const app = createApp(App)
+        
+        app.use(router)
+        
+        app.mount('#app')
+        ---Fin Código---
+      📂 assets
+        📄 base.css
+          ---Código---
+          /* color palette from <https://github.com/vuejs/theme> */
+          :root {
+            --vt-c-white: #ffffff;
+            --vt-c-white-soft: #f8f8f8;
+            --vt-c-white-mute: #f2f2f2;
+          
+            --vt-c-black: #181818;
+            --vt-c-black-soft: #222222;
+            --vt-c-black-mute: #282828;
+          
+            --vt-c-indigo: #2c3e50;
+          
+            --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+            --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+            --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+            --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+          
+            --vt-c-text-light-1: var(--vt-c-indigo);
+            --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+            --vt-c-text-dark-1: var(--vt-c-white);
+            --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+          }
+          
+          /* semantic color variables for this project */
+          :root {
+            --color-background: var(--vt-c-white);
+            --color-background-soft: var(--vt-c-white-soft);
+            --color-background-mute: var(--vt-c-white-mute);
+          
+            --color-border: var(--vt-c-divider-light-2);
+            --color-border-hover: var(--vt-c-divider-light-1);
+          
+            --color-heading: var(--vt-c-text-light-1);
+            --color-text: var(--vt-c-text-light-1);
+          
+            --section-gap: 160px;
+          }
+          
+          @media (prefers-color-scheme: dark) {
+            :root {
+              --color-background: var(--vt-c-black);
+              --color-background-soft: var(--vt-c-black-soft);
+              --color-background-mute: var(--vt-c-black-mute);
+          
+              --color-border: var(--vt-c-divider-dark-2);
+              --color-border-hover: var(--vt-c-divider-dark-1);
+          
+              --color-heading: var(--vt-c-text-dark-1);
+              --color-text: var(--vt-c-text-dark-2);
+            }
+          }
+          
+          *,
+          *::before,
+          *::after {
+            box-sizing: border-box;
+            margin: 0;
+            font-weight: normal;
+          }
+          
+          body {
+            min-height: 100vh;
+            color: var(--color-text);
+            background: var(--color-background);
+            transition:
+              color 0.5s,
+              background-color 0.5s;
+            line-height: 1.6;
+            font-family:
+              Inter,
+              -apple-system,
+              BlinkMacSystemFont,
+              'Segoe UI',
+              Roboto,
+              Oxygen,
+              Ubuntu,
+              Cantarell,
+              'Fira Sans',
+              'Droid Sans',
+              'Helvetica Neue',
+              sans-serif;
+            font-size: 15px;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+          ---Fin Código---
+        📄 logo.svg
+        📄 main.css
+          ---Código---
+          /* src/assets/main.css */
+          
+          /* 1. Sistema de Diseño: Variables de Color y Layout */
+          :root {
+            /* --- Paleta de Colores de Marca --- */
+            --color-fondo: #101010; /* Un negro aún más profundo */
+            --color-superficie: #1c1c1c; /* Un gris oscuro para las tarjetas */
+            --color-primario: #e8b943; /* Dorado de la marca */
+            --color-borde: #2a2a2a; /* Un color sutil para bordes y separadores */
+          
+            --color-texto-principal: #f0f0f0; /* Un blanco roto, más suave a la vista */
+            --color-texto-secundario: #a0a0a0;
+          
+            --radio-borde: 8px;
+          
+            /* --- Variables de Layout --- */
+            --header-height: 60px;
+            --subheader-height: 50px;
+          }
+          
+          /* 2. Reset Básico y Tipografía Profesional */
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          
+          body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto-principal);
+            line-height: 1.7; /* Aumentamos el interlineado para mejor legibilidad */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+          
+          #app {
+            min-height: 100vh;
+            padding-top: calc(var(--header-height) + var(--subheader-height));
+          }
+          
+          /* --- Escala de Tipografía --- */
+          h1,
+          h2,
+          h3,
+          h4 {
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--color-texto-principal); /* Títulos principales en blanco */
+            letter-spacing: -0.5px; /* Detalle profesional */
+          }
+          h1 {
+            font-size: 2.5rem;
+          }
+          h2 {
+            font-size: 1.75rem;
+          }
+          h3 {
+            font-size: 1.25rem;
+          }
+          
+          /* Los enlaces usarán el color primario para destacar */
+          a {
+            text-decoration: none;
+            color: var(--color-primario);
+            transition: filter 0.2s ease;
+          }
+          a:hover {
+            filter: brightness(1.2);
+          }
+          
+          /* --- Contenedor Principal --- */
+          /* Usaremos esta clase en nuestras vistas para unificar el padding */
+          .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+          }
+          ---Fin Código---
+        📂 images
+          📄 logo.png
+        📂 patrocinadores
+          📄 CostiBarber.png
+      📂 components
+        📄 AppFooter.vue
+        📄 AppHeader.vue
+        📄 BannerPatrocinador.vue
+        📄 EncuestaActiva.vue
+        📄 SubHeader.vue
+        📂 icons
+          📄 IconCommunity.vue
+          📄 IconDocumentation.vue
+          📄 IconEcosystem.vue
+          📄 IconSupport.vue
+          📄 IconTooling.vue
+      📂 data
+        📄 patrocinadores.js
+          ---Código---
+          // src/data/patrocinadores.js
+          
+          // Para que esto funcione, primero debes colocar las imágenes
+          // dentro de la carpeta 'src/assets/patrocinadores/'
+          
+          // 1. Importa cada imagen que quieras usar
+          import CostiBarber from '@/assets/patrocinadores/CostiBarber.png'
+          // (cuando añadas un nuevo logo, impórtalo aquí)
+          
+          // 2. Crea y exporta el array de patrocinadores
+          export const listaPatrocinadores = [
+            {
+              id: 1,
+              nombre: 'CostiBarber',
+              enlace: 'https://www.instagram.com/costi.barberr',
+              imagen: CostiBarber, // Usa la variable importada
+            },
+            // Para añadir más, solo copia un bloque de arriba y pégalo aquí
+          ]
+          
+          // NOTA: Para este ejemplo, necesitarás tener 4 imágenes de ejemplo en
+          // tu carpeta 'src/assets/patrocinadores/' llamadas:
+          // - sponsor-a.png
+          ---Fin Código---
+      📂 firebase
+        📄 config.js
+          ---Código---
+          // src/firebase/config.js
+          
+          import { initializeApp } from 'firebase/app'
+          import { getFirestore } from 'firebase/firestore'
+          import { getAuth } from 'firebase/auth'
+          
+          // ¡ESTE ES EL ARCHIVO IMPORTANTE AHORA!
+          // La conexión a Firebase se establece aquí con estas claves.
+          const firebaseConfig = {
+            apiKey: 'AIzaSyAXfKdc6dfdi0ZxV-aIMzi_cRD654asPU4',
+            authDomain: 'pes6balcarce2026.firebaseapp.com',
+            projectId: 'pes6balcarce2026',
+            storageBucket: 'pes6balcarce2026.appspot.com',
+            messagingSenderId: '896058552329',
+            appId: '1:896058552329:web:35790a6652671130c108d8',
+            measurementId: 'G-KQ25EKH280',
+          }
+          
+          const app = initializeApp(firebaseConfig)
+          const db = getFirestore(app)
+          const auth = getAuth(app)
+          
+          export { db, auth }
+          ---Fin Código---
+      📂 layouts
+        📄 AdminLayout.vue
+      📂 router
+        📄 index.js
+          ---Código---
+          // src/router/index.js
+          
+          import { createRouter, createWebHistory } from 'vue-router'
+          import { onAuthStateChanged } from 'firebase/auth'
+          import { auth } from '@/firebase/config'
+          
+          // Vistas Públicas
+          import HomeView from '../views/HomeView.vue'
+          import NoticiasView from '../views/NoticiasView.vue'
+          import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
+          import DescargasView from '@/views/DescargasView.vue'
+          import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
+          
+          // Vistas de Autenticación y Perfil de Usuario
+          import RegistroView from '@/views/RegistroView.vue'
+          import LoginView from '@/views/LoginView.vue'
+          import PerfilView from '@/views/PerfilView.vue'
+          
+          // Vistas y Layout del Admin
+          import AdminLayout from '@/layouts/AdminLayout.vue'
+          import AdminLoginView from '../views/admin/AdminLoginView.vue'
+          import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
+          import AdminEncuestasView from '@/views/admin/AdminEncuestasView.vue'
+          import AdminJugadoresView from '@/views/admin/AdminJugadoresView.vue'
+          import AdminNoticiasView from '@/views/admin/AdminNoticiasView.vue'
+          import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue' // <-- ESTA ES LA LÍNEA QUE FALTABA
+          import AdminVersionesView from '@/views/admin/AdminVersionesView.vue' // <-- Importación para la nueva vista de admin
+          
+          const router = createRouter({
+            history: createWebHistory(import.meta.env.BASE_URL),
+            routes: [
+              // --- Rutas Públicas y de Usuario ---
+              { path: '/', name: 'home', component: HomeView },
+              { path: '/descargas', name: 'descargas', component: DescargasView },
+              {
+                path: '/descargas/historial',
+                name: 'historial-versiones',
+                component: HistorialVersionesView,
+              },
+              { path: '/noticias', name: 'noticias', component: NoticiasView },
+              { path: '/noticias/:id', name: 'noticia-detalle', component: NoticiaDetalleView, props: true },
+              { path: '/registro', name: 'registro', component: RegistroView },
+              { path: '/login', name: 'login', component: LoginView },
+              {
+                path: '/perfil',
+                name: 'perfil',
+                component: PerfilView,
+                meta: { requiresAuth: true },
+              },
+          
+              // --- Rutas de Administración ---
+              { path: '/admin/login', name: 'admin-login', component: AdminLoginView },
+              {
+                path: '/admin',
+                component: AdminLayout,
+                meta: { requiresAuth: true },
+                children: [
+                  { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboardView },
+                  { path: 'encuestas', name: 'admin-encuestas', component: AdminEncuestasView },
+                  { path: 'jugadores', name: 'admin-jugadores', component: AdminJugadoresView },
+                  { path: 'noticias', name: 'admin-noticias', component: AdminNoticiasView },
+                  {
+                    path: 'patrocinadores',
+                    name: 'admin-patrocinadores',
+                    component: AdminPatrocinadoresView,
+                  },
+                  { path: 'versiones', name: 'admin-versiones', component: AdminVersionesView },
+                ],
+              },
+            ],
+          })
+          
+          // El guardián de rutas se queda exactamente igual
+          const getCurrentUser = () => {
+            return new Promise((resolve, reject) => {
+              const removeListener = onAuthStateChanged(
+                auth,
+                (user) => {
+                  removeListener()
+                  resolve(user)
+                },
+                reject,
+              )
+            })
+          }
+          
+          router.beforeEach(async (to, from, next) => {
+            const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+            const isAdminRoute = to.path.startsWith('/admin/')
+            const currentUser = await getCurrentUser()
+          
+            if (requiresAuth && !currentUser) {
+              if (isAdminRoute) {
+                next({ name: 'admin-login' })
+              } else {
+                next({ name: 'login' })
+              }
+            } else {
+              next()
+            }
+          })
+          
+          export default router
+          ---Fin Código---
+      📂 stores
+        📄 counter.js
+          ---Código---
+          import { ref, computed } from 'vue'
+          import { defineStore } from 'pinia'
+          
+          export const useCounterStore = defineStore('counter', () => {
+            const count = ref(0)
+            const doubleCount = computed(() => count.value * 2)
+            function increment() {
+              count.value++
+            }
+          
+            return { count, doubleCount, increment }
+          })
+          ---Fin Código---
+      📂 views
+        📄 DescargasView.vue
+        📄 HistorialVersionesView.vue
+        📄 HomeView.vue
+        📄 LoginView.vue
+        📄 NoticiaDetalleView.vue
+        📄 NoticiasView.vue
+        📄 PerfilView.vue
+        📄 RegistroView.vue
+        📂 admin
+          📄 AdminDashboardView.vue
+          📄 AdminEncuestasView.vue
+          📄 AdminJugadoresView.vue
+          📄 AdminLoginView.vue
+          📄 AdminNoticiasView.vue
+          📄 AdminPatrocinadoresView.vue
+          📄 AdminVersionesView.vue
+    --- Fin del Contenido ---
+
+  📄 estructura_completa.txt
+    --- Contenido del Archivo ---
+    Estructura del proyecto en: C:/Users/fabia/OneDrive/Desktop/Nueva carpeta (3)/pes6balcarce-web/src
+    ========================================
+    
+    📂 src/
+      📄 App.vue
+        --- Contenido del Archivo ---
+        <template>
+          <div id="app-wrapper">
+            <!-- Cabecera y sub-cabecera fijas en la parte superior -->
+            <AppHeader />
+            <SubHeader />
+        
+            <!-- 
+              Este es el nuevo contenedor principal que utiliza CSS Grid.
+              Se divide en un área de contenido principal y una barra lateral derecha.
+            -->
+            <div class="main-layout-grid">
+              <!-- El contenido de la página actual (Home, Noticias, etc.) se renderiza aquí -->
+              <main class="main-content">
+                <RouterView />
+              </main>
+        
+              <!-- 
+                La barra lateral (sidebar) para el banner vertical.
+                Es semánticamente correcto usar la etiqueta <aside>.
+                Se mostrará u ocultará con CSS según el tamaño de la pantalla.
+              -->
+              <aside class="sidebar-right">
+                <BannerVertical />
+              </aside>
+            </div>
+        
+            <!-- 
+              El banner horizontal (leaderboard) se puede colocar después del contenido principal,
+              antes del pie de página.
+            -->
+            <BannerPatrocinador />
+        
+            <!-- Pie de página al final de todo -->
+            <AppFooter />
+          </div>
+        </template>
+        
+        <script setup>
+        // --- Importaciones Necesarias ---
+        // RouterView es esencial para que el sistema de rutas de Vue funcione.
+        import { RouterView } from 'vue-router'
+        
+        // Componentes del layout principal de la aplicación.
+        import AppHeader from '@/components/AppHeader.vue'
+        import SubHeader from '@/components/SubHeader.vue'
+        import AppFooter from '@/components/AppFooter.vue'
+        
+        // Componentes de publicidad.
+        import BannerPatrocinador from '@/components/BannerPatrocinador.vue' // Banner horizontal
+        import BannerVertical from '@/components/BannerVertical.vue' // Nuevo banner vertical
+        </script>
+        
+        <style scoped>
+        /* 
+          Estilos específicos para el layout de App.vue.
+          'scoped' asegura que estos estilos no afectarán a otros componentes.
+        */
+        
+        /* Contenedor global de la aplicación */
+        #app-wrapper {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh; /* Asegura que el wrapper ocupe al menos toda la altura de la pantalla */
+        }
+        
+        /* El grid que define la estructura del contenido y la barra lateral */
+        .main-layout-grid {
+          display: grid;
+          width: 100%;
+          max-width: 1440px; /* Ancho máximo para mantener la legibilidad en pantallas muy grandes */
+          margin: 0 auto; /* Centra el layout en la página */
+          padding: 2rem 1.5rem; /* Espaciado interno */
+          gap: 2rem; /* Espacio entre el contenido y la barra lateral */
+          flex-grow: 1; /* Permite que este contenedor crezca para empujar el footer hacia abajo */
+        }
+        
+        /* --- ESTILOS PARA ESCRITORIO (Desktop First) --- */
+        
+        /* Por defecto, definimos 2 columnas: contenido flexible (1fr) y barra lateral de ancho fijo (214px) */
+        .main-layout-grid {
+          grid-template-columns: 1fr 214px;
+        }
+        
+        .main-content {
+          min-width: 0; /* Un truco de CSS para prevenir que elementos internos desborden el grid */
+        }
+        
+        .sidebar-right {
+          position: sticky; /* Fija la barra lateral para que no se pierda al hacer scroll */
+          /* Se alinea debajo de los headers. El '2rem' es por el padding del .main-layout-grid */
+          top: calc(var(--header-height) + var(--subheader-height) + 2rem);
+          height: fit-content; /* Necesario para que 'position: sticky' funcione correctamente */
+        }
+        
+        /* --- MEDIA QUERY PARA RESPONSIVE --- */
+        
+        /* Cuando la pantalla sea de 1024px o menos (tablets y móviles)... */
+        @media (max-width: 1024px) {
+          .main-layout-grid {
+            /* ...cambiamos el grid a una sola columna para que el contenido ocupe todo el ancho. */
+            grid-template-columns: 1fr;
+            padding: 1.5rem 1rem; /* Reducimos un poco el padding en pantallas pequeñas */
+          }
+        
+          .sidebar-right {
+            /* ...y ocultamos completamente la barra lateral. */
+            display: none;
+          }
+        }
+        </style>
+        --- Fin del Contenido ---
+    
+      📄 estructura.txt
+        --- Contenido del Archivo ---
+        📂 src
+          📄 App.vue
+          📄 estructura.txt
+            ---Código---
+            ---Fin Código---
+          📄 main.js
+            ---Código---
+            // src/main.js
+            
+            // 1. Eliminamos los console.log que leían las variables de entorno.
+            // Ya no son necesarios porque la configuración está directamente en config.js.
+            
+            // 2. Importa tu configuración de Firebase. Esto asegura que se inicialice.
+            import '@/firebase/config'
+            
+            import './assets/main.css'
+            
+            import { createApp } from 'vue'
+            import App from './App.vue'
+            import router from './router'
+            
+            const app = createApp(App)
+            
+            app.use(router)
+            
+            app.mount('#app')
+            ---Fin Código---
+          📂 assets
+            📄 base.css
+              ---Código---
+              /* color palette from <https://github.com/vuejs/theme> */
+              :root {
+                --vt-c-white: #ffffff;
+                --vt-c-white-soft: #f8f8f8;
+                --vt-c-white-mute: #f2f2f2;
+              
+                --vt-c-black: #181818;
+                --vt-c-black-soft: #222222;
+                --vt-c-black-mute: #282828;
+              
+                --vt-c-indigo: #2c3e50;
+              
+                --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+                --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+                --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+                --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+              
+                --vt-c-text-light-1: var(--vt-c-indigo);
+                --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+                --vt-c-text-dark-1: var(--vt-c-white);
+                --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+              }
+              
+              /* semantic color variables for this project */
+              :root {
+                --color-background: var(--vt-c-white);
+                --color-background-soft: var(--vt-c-white-soft);
+                --color-background-mute: var(--vt-c-white-mute);
+              
+                --color-border: var(--vt-c-divider-light-2);
+                --color-border-hover: var(--vt-c-divider-light-1);
+              
+                --color-heading: var(--vt-c-text-light-1);
+                --color-text: var(--vt-c-text-light-1);
+              
+                --section-gap: 160px;
+              }
+              
+              @media (prefers-color-scheme: dark) {
+                :root {
+                  --color-background: var(--vt-c-black);
+                  --color-background-soft: var(--vt-c-black-soft);
+                  --color-background-mute: var(--vt-c-black-mute);
+              
+                  --color-border: var(--vt-c-divider-dark-2);
+                  --color-border-hover: var(--vt-c-divider-dark-1);
+              
+                  --color-heading: var(--vt-c-text-dark-1);
+                  --color-text: var(--vt-c-text-dark-2);
+                }
+              }
+              
+              *,
+              *::before,
+              *::after {
+                box-sizing: border-box;
+                margin: 0;
+                font-weight: normal;
+              }
+              
+              body {
+                min-height: 100vh;
+                color: var(--color-text);
+                background: var(--color-background);
+                transition:
+                  color 0.5s,
+                  background-color 0.5s;
+                line-height: 1.6;
+                font-family:
+                  Inter,
+                  -apple-system,
+                  BlinkMacSystemFont,
+                  'Segoe UI',
+                  Roboto,
+                  Oxygen,
+                  Ubuntu,
+                  Cantarell,
+                  'Fira Sans',
+                  'Droid Sans',
+                  'Helvetica Neue',
+                  sans-serif;
+                font-size: 15px;
+                text-rendering: optimizeLegibility;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+              }
+              ---Fin Código---
+            📄 logo.svg
+            📄 main.css
+              ---Código---
+              /* src/assets/main.css */
+              
+              /* 1. Sistema de Diseño: Variables de Color y Layout */
+              :root {
+                /* --- Paleta de Colores de Marca --- */
+                --color-fondo: #101010; /* Un negro aún más profundo */
+                --color-superficie: #1c1c1c; /* Un gris oscuro para las tarjetas */
+                --color-primario: #e8b943; /* Dorado de la marca */
+                --color-borde: #2a2a2a; /* Un color sutil para bordes y separadores */
+              
+                --color-texto-principal: #f0f0f0; /* Un blanco roto, más suave a la vista */
+                --color-texto-secundario: #a0a0a0;
+              
+                --radio-borde: 8px;
+              
+                /* --- Variables de Layout --- */
+                --header-height: 60px;
+                --subheader-height: 50px;
+              }
+              
+              /* 2. Reset Básico y Tipografía Profesional */
+              * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+              }
+              
+              body {
+                font-family: 'Roboto', sans-serif;
+                background-color: var(--color-fondo);
+                color: var(--color-texto-principal);
+                line-height: 1.7; /* Aumentamos el interlineado para mejor legibilidad */
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+              }
+              
+              #app {
+                min-height: 100vh;
+                padding-top: calc(var(--header-height) + var(--subheader-height));
+              }
+              
+              /* --- Escala de Tipografía --- */
+              h1,
+              h2,
+              h3,
+              h4 {
+                font-weight: 700;
+                line-height: 1.3;
+                color: var(--color-texto-principal); /* Títulos principales en blanco */
+                letter-spacing: -0.5px; /* Detalle profesional */
+              }
+              h1 {
+                font-size: 2.5rem;
+              }
+              h2 {
+                font-size: 1.75rem;
+              }
+              h3 {
+                font-size: 1.25rem;
+              }
+              
+              /* Los enlaces usarán el color primario para destacar */
+              a {
+                text-decoration: none;
+                color: var(--color-primario);
+                transition: filter 0.2s ease;
+              }
+              a:hover {
+                filter: brightness(1.2);
+              }
+              
+              /* --- Contenedor Principal --- */
+              /* Usaremos esta clase en nuestras vistas para unificar el padding */
+              .page-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem 1.5rem;
+              }
+              ---Fin Código---
+            📂 images
+              📄 logo.png
+            📂 patrocinadores
+              📄 CostiBarber.png
+          📂 components
+            📄 AppFooter.vue
+            📄 AppHeader.vue
+            📄 BannerPatrocinador.vue
+            📄 EncuestaActiva.vue
+            📄 SubHeader.vue
+            📂 icons
+              📄 IconCommunity.vue
+              📄 IconDocumentation.vue
+              📄 IconEcosystem.vue
+              📄 IconSupport.vue
+              📄 IconTooling.vue
+          📂 data
+            📄 patrocinadores.js
+              ---Código---
+              // src/data/patrocinadores.js
+              
+              // Para que esto funcione, primero debes colocar las imágenes
+              // dentro de la carpeta 'src/assets/patrocinadores/'
+              
+              // 1. Importa cada imagen que quieras usar
+              import CostiBarber from '@/assets/patrocinadores/CostiBarber.png'
+              // (cuando añadas un nuevo logo, impórtalo aquí)
+              
+              // 2. Crea y exporta el array de patrocinadores
+              export const listaPatrocinadores = [
+                {
+                  id: 1,
+                  nombre: 'CostiBarber',
+                  enlace: 'https://www.instagram.com/costi.barberr',
+                  imagen: CostiBarber, // Usa la variable importada
+                },
+                // Para añadir más, solo copia un bloque de arriba y pégalo aquí
+              ]
+              
+              // NOTA: Para este ejemplo, necesitarás tener 4 imágenes de ejemplo en
+              // tu carpeta 'src/assets/patrocinadores/' llamadas:
+              // - sponsor-a.png
+              ---Fin Código---
+          📂 firebase
+            📄 config.js
+              ---Código---
+              // src/firebase/config.js
+              
+              import { initializeApp } from 'firebase/app'
+              import { getFirestore } from 'firebase/firestore'
+              import { getAuth } from 'firebase/auth'
+              
+              // ¡ESTE ES EL ARCHIVO IMPORTANTE AHORA!
+              // La conexión a Firebase se establece aquí con estas claves.
+              const firebaseConfig = {
+                apiKey: 'AIzaSyAXfKdc6dfdi0ZxV-aIMzi_cRD654asPU4',
+                authDomain: 'pes6balcarce2026.firebaseapp.com',
+                projectId: 'pes6balcarce2026',
+                storageBucket: 'pes6balcarce2026.appspot.com',
+                messagingSenderId: '896058552329',
+                appId: '1:896058552329:web:35790a6652671130c108d8',
+                measurementId: 'G-KQ25EKH280',
+              }
+              
+              const app = initializeApp(firebaseConfig)
+              const db = getFirestore(app)
+              const auth = getAuth(app)
+              
+              export { db, auth }
+              ---Fin Código---
+          📂 layouts
+            📄 AdminLayout.vue
+          📂 router
+            📄 index.js
+              ---Código---
+              // src/router/index.js
+              
+              import { createRouter, createWebHistory } from 'vue-router'
+              import { onAuthStateChanged } from 'firebase/auth'
+              import { auth } from '@/firebase/config'
+              
+              // Vistas Públicas
+              import HomeView from '../views/HomeView.vue'
+              import NoticiasView from '../views/NoticiasView.vue'
+              import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
+              import DescargasView from '@/views/DescargasView.vue'
+              import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
+              
+              // Vistas de Autenticación y Perfil de Usuario
+              import RegistroView from '@/views/RegistroView.vue'
+              import LoginView from '@/views/LoginView.vue'
+              import PerfilView from '@/views/PerfilView.vue'
+              
+              // Vistas y Layout del Admin
+              import AdminLayout from '@/layouts/AdminLayout.vue'
+              import AdminLoginView from '../views/admin/AdminLoginView.vue'
+              import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
+              import AdminEncuestasView from '@/views/admin/AdminEncuestasView.vue'
+              import AdminJugadoresView from '@/views/admin/AdminJugadoresView.vue'
+              import AdminNoticiasView from '@/views/admin/AdminNoticiasView.vue'
+              import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue' // <-- ESTA ES LA LÍNEA QUE FALTABA
+              import AdminVersionesView from '@/views/admin/AdminVersionesView.vue' // <-- Importación para la nueva vista de admin
+              
+              const router = createRouter({
+                history: createWebHistory(import.meta.env.BASE_URL),
+                routes: [
+                  // --- Rutas Públicas y de Usuario ---
+                  { path: '/', name: 'home', component: HomeView },
+                  { path: '/descargas', name: 'descargas', component: DescargasView },
+                  {
+                    path: '/descargas/historial',
+                    name: 'historial-versiones',
+                    component: HistorialVersionesView,
+                  },
+                  { path: '/noticias', name: 'noticias', component: NoticiasView },
+                  { path: '/noticias/:id', name: 'noticia-detalle', component: NoticiaDetalleView, props: true },
+                  { path: '/registro', name: 'registro', component: RegistroView },
+    --- Fin del Contenido ---
+
+  📄 main.js
+    --- Contenido del Archivo ---
+    // src/main.js
+    
+    // 1. Eliminamos los console.log que leían las variables de entorno.
+    // Ya no son necesarios porque la configuración está directamente en config.js.
+    
+    // 2. Importa tu configuración de Firebase. Esto asegura que se inicialice.
+    import '@/firebase/config'
+    
+    import './assets/main.css'
+    
+    import { createApp } from 'vue'
+    import App from './App.vue'
+    import router from './router'
+    
+    const app = createApp(App)
+    
+    app.use(router)
+    
+    app.mount('#app')
+    --- Fin del Contenido ---
+
+  📂 assets/
+    📄 base.css
+      --- Contenido del Archivo ---
+      /* color palette from <https://github.com/vuejs/theme> */
+      :root {
+        --vt-c-white: #ffffff;
+        --vt-c-white-soft: #f8f8f8;
+        --vt-c-white-mute: #f2f2f2;
+      
+        --vt-c-black: #181818;
+        --vt-c-black-soft: #222222;
+        --vt-c-black-mute: #282828;
+      
+        --vt-c-indigo: #2c3e50;
+      
+        --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+        --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+        --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+        --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+      
+        --vt-c-text-light-1: var(--vt-c-indigo);
+        --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+        --vt-c-text-dark-1: var(--vt-c-white);
+        --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+      }
+      
+      /* semantic color variables for this project */
+      :root {
+        --color-background: var(--vt-c-white);
+        --color-background-soft: var(--vt-c-white-soft);
+        --color-background-mute: var(--vt-c-white-mute);
+      
+        --color-border: var(--vt-c-divider-light-2);
+        --color-border-hover: var(--vt-c-divider-light-1);
+      
+        --color-heading: var(--vt-c-text-light-1);
+        --color-text: var(--vt-c-text-light-1);
+      
+        --section-gap: 160px;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-background: var(--vt-c-black);
+          --color-background-soft: var(--vt-c-black-soft);
+          --color-background-mute: var(--vt-c-black-mute);
+      
+          --color-border: var(--vt-c-divider-dark-2);
+          --color-border-hover: var(--vt-c-divider-dark-1);
+      
+          --color-heading: var(--vt-c-text-dark-1);
+          --color-text: var(--vt-c-text-dark-2);
+        }
+      }
+      
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        font-weight: normal;
+      }
+      
+      body {
+        min-height: 100vh;
+        color: var(--color-text);
+        background: var(--color-background);
+        transition:
+          color 0.5s,
+          background-color 0.5s;
+        line-height: 1.6;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Fira Sans',
+          'Droid Sans',
+          'Helvetica Neue',
+          sans-serif;
+        font-size: 15px;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      --- Fin del Contenido ---
+
+    📄 logo.svg
+      --- Contenido del Archivo ---
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 261.76 226.69"><path d="M161.096.001l-30.225 52.351L100.647.001H-.005l130.877 226.688L261.749.001z" fill="#41b883"/><path d="M161.096.001l-30.225 52.351L100.647.001H52.346l78.526 136.01L209.398.001z" fill="#34495e"/></svg>
+      --- Fin del Contenido ---
+
+    📄 main.css
+      --- Contenido del Archivo ---
+      /* src/assets/main.css */
+      
+      /* 1. Sistema de Diseño: Variables de Color y Layout */
+      :root {
+        /* --- Paleta de Colores de Marca --- */
+        --color-fondo: #101010; /* Un negro aún más profundo */
+        --color-superficie: #1c1c1c; /* Un gris oscuro para las tarjetas */
+        --color-primario: #e8b943; /* Dorado de la marca */
+        --color-borde: #2a2a2a; /* Un color sutil para bordes y separadores */
+      
+        --color-texto-principal: #f0f0f0; /* Un blanco roto, más suave a la vista */
+        --color-texto-secundario: #a0a0a0;
+      
+        --radio-borde: 8px;
+      
+        /* --- Variables de Layout --- */
+        --header-height: 60px;
+        --subheader-height: 50px;
+      }
+      
+      /* 2. Reset Básico y Tipografía Profesional */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--color-fondo);
+        color: var(--color-texto-principal);
+        line-height: 1.7; /* Aumentamos el interlineado para mejor legibilidad */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      #app {
+        min-height: 100vh;
+        padding-top: calc(var(--header-height) + var(--subheader-height));
+      }
+      
+      /* --- Escala de Tipografía --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--color-texto-principal); /* Títulos principales en blanco */
+        letter-spacing: -0.5px; /* Detalle profesional */
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+      h2 {
+        font-size: 1.75rem;
+      }
+      h3 {
+        font-size: 1.25rem;
+      }
+      
+      /* Los enlaces usarán el color primario para destacar */
+      a {
+        text-decoration: none;
+        color: var(--color-primario);
+        transition: filter 0.2s ease;
+      }
+      a:hover {
+        filter: brightness(1.2);
+      }
+      --- Fin del Contenido ---
+
+    📂 images/
+      📄 logo.png
+        [Archivo binario o no legible como texto. Contenido omitido.]
+
+    📂 patrocinadores-horizontal/
+      📄 CostiBarber.png
+        [Archivo binario o no legible como texto. Contenido omitido.]
+
+    📂 patrocinadores-vertical/
+      📄 CostiBarberVertical.png
+        [Archivo binario o no legible como texto. Contenido omitido.]
+
+  📂 components/
+    📄 AppFooter.vue
+      --- Contenido del Archivo ---
+      <!-- src/components/AppFooter.vue -->
+      <template>
+        <footer class="app-footer">
+          <div class="footer-content page-container">
+            <div class="contact-section">
+              <h3 class="footer-title">Contacto y Colaboraciones</h3>
+              <p class="footer-text">
+                ¿Quieres enviar información de equipos, kits, o te interesa aparecer como patrocinador?
+                <br />
+                ¡Nos encantaría escucharte! Contáctanos directamente a través de Instagram.
+              </p>
+              <div class="contact-buttons">
+                <!-- Botón principal que intenta abrir la APP -->
+                <a href="instagram://user?username=pes6balcarce" class="btn-contact">
+                  Contactar por Instagram (App)
+                </a>
+                <!-- Enlace secundario como fallback para el NAVEGADOR -->
+                <a
+                  href="https://www.instagram.com/pes6balcarce"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="fallback-link"
+                >
+                  (Abrir en navegador si no tienes la app)
+                </a>
+              </div>
+            </div>
+            <div class="copyright-section">
+              <p>&copy; {{ new Date().getFullYear() }} PES 6 Balcarce. Todos los derechos reservados.</p>
+            </div>
+          </div>
+        </footer>
+      </template>
+      
+      <style scoped>
+      .app-footer {
+        background-color: #0a0a0a; /* Un negro un poco más puro */
+        border-top: 1px solid var(--color-borde);
+        padding: 3rem 0;
+        margin-top: 3rem; /* Espacio para separarlo del contenido de la página */
+      }
+      
+      .footer-content {
+        text-align: center;
+      }
+      
+      .footer-title {
+        color: var(--color-primario);
+        margin-bottom: 1rem;
+      }
+      
+      .footer-text {
+        max-width: 600px;
+        margin: 0 auto 2rem auto;
+        color: var(--color-texto-secundario);
+        line-height: 1.8;
+      }
+      
+      .contact-buttons {
+        margin-bottom: 3rem;
+      }
+      
+      .btn-contact {
+        display: inline-block;
+        background-color: var(--color-primario);
+        color: #101010;
+        padding: 0.8rem 2rem;
+        border-radius: 50px; /* Botón píldora */
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      
+      .btn-contact:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(232, 185, 67, 0.3);
+      }
+      
+      .fallback-link {
+        display: block;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: var(--color-texto-secundario);
+        text-decoration: underline;
+      }
+      
+      .copyright-section p {
+        font-size: 0.9rem;
+        color: #666; /* Un gris aún más sutil para el copyright */
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 AppHeader.vue
+      --- Contenido del Archivo ---
+      <!-- src/components/AppHeader.vue -->
+      <template>
+        <header class="app-header">
+          <div class="header-content">
+            <RouterLink to="/" class="logo-link">
+              <img src="@/assets/images/logo.png" alt="Logo" class="logo" />
+              <h1 class="app-title">PES 6 Balcarce</h1>
+            </RouterLink>
+          </div>
+      
+          <nav class="main-nav">
+            <!-- Enlace de Descarga Fijo -->
+            <RouterLink to="/descargas" class="nav-link download-link">
+              Descargar Parche
+              <span v-if="ultimaVersion" class="version-badge">{{ ultimaVersion }}</span>
+            </RouterLink>
+      
+            <!-- Lógica de Autenticación -->
+            <div v-if="user" class="user-section">
+              <RouterLink to="/perfil" class="nav-link profile-link">
+                <span>Mi Perfil</span>
+              </RouterLink>
+            </div>
+            <div v-else class="auth-buttons">
+              <RouterLink to="/login" class="nav-link auth-link login">Iniciar Sesión</RouterLink>
+              <RouterLink to="/registro" class="nav-link auth-link register">Registrarse</RouterLink>
+            </div>
+          </nav>
+        </header>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted, onUnmounted } from 'vue'
+      import { db, auth } from '@/firebase/config'
+      import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+      import { onAuthStateChanged } from 'firebase/auth'
+      
+      const ultimaVersion = ref('')
+      const user = ref(null)
+      
+      let unsubscribeAuth
+      
+      onMounted(() => {
+        unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+          user.value = currentUser
+        })
+      
+        const fetchUltimaVersion = async () => {
+          try {
+            const q = query(collection(db, 'versiones'), orderBy('fechaPublicacion', 'desc'), limit(1))
+            const querySnapshot = await getDocs(q)
+            if (!querySnapshot.empty) {
+              ultimaVersion.value = querySnapshot.docs[0].data().nombre
+            }
+          } catch (error) {
+            console.error('Error al obtener la última versión para el header:', error)
+          }
+        }
+        fetchUltimaVersion()
+      })
+      
+      onUnmounted(() => {
+        if (unsubscribeAuth) {
+          unsubscribeAuth()
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* --- AQUÍ ESTÁ LA CORRECCIÓN --- */
+      .app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--header-height);
+        background-color: var(--color-superficie); /* Corregido */
+        color: var(--color-texto-principal);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid var(--color-borde);
+        z-index: 1000;
+      }
+      
+      .logo-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+      }
+      .logo {
+        height: 35px;
+        width: auto;
+      }
+      .app-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--color-primario);
+      }
+      .main-nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .nav-link {
+        color: var(--color-texto-principal);
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radio-borde);
+        transition: background-color 0.2s;
+      }
+      .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .download-link {
+        background-color: var(--color-primario);
+        color: #121212;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .version-badge {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+      
+      /* Estilos para la sección de usuario */
+      .user-section,
+      .auth-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .profile-link {
+        border: 2px solid var(--color-primario);
+      }
+      
+      .auth-link.register {
+        background-color: var(--color-primario);
+        color: #121212;
+      }
+      
+      .auth-link.login {
+        background-color: transparent;
+        border: 2px solid var(--color-texto-secundario);
+        color: var(--color-texto-secundario);
+      }
+      .auth-link.login:hover {
+        background-color: var(--color-texto-secundario);
+        color: #121212;
+      }
+      
+      /* Ocultar texto en móviles para que quepan los botones */
+      @media (max-width: 768px) {
+        .auth-buttons .nav-link span,
+        .user-section .nav-link span {
+          display: none;
+        }
+        .auth-buttons .nav-link,
+        .user-section .nav-link {
+          padding: 0.5rem; /* Hacemos los botones cuadrados */
+        }
+        .auth-link.login::before {
+          content: '→';
+          font-size: 1.2rem;
+        }
+        .auth-link.register::before {
+          content: '👤';
+          font-size: 1.2rem;
+        }
+        .profile-link::before {
+          content: '⚙️';
+          font-size: 1.2rem;
+        }
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 BannerPatrocinador.vue
+      --- Contenido del Archivo ---
+      <template>
+        <div class="banner-patrocinador-container">
+          <a
+            v-if="patrocinador"
+            :href="patrocinador.enlace"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="banner-link"
+          >
+            <img :src="patrocinador.imagen" :alt="`Patrocinador: ${patrocinador.nombre}`" />
+          </a>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      // --- CAMBIO IMPORTANTE ---
+      // Ahora importamos desde el archivo específico para banners horizontales.
+      import { listaPatrocinadoresHorizontales } from '@/data/patrocinadoresHorizontal.js'
+      
+      const patrocinador = ref(null)
+      
+      onMounted(() => {
+        // Y usamos la lista correcta.
+        if (listaPatrocinadoresHorizontales && listaPatrocinadoresHorizontales.length > 0) {
+          const randomIndex = Math.floor(Math.random() * listaPatrocinadoresHorizontales.length)
+          patrocinador.value = listaPatrocinadoresHorizontales[randomIndex]
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* Estilos para el banner horizontal */
+      .banner-patrocinador-container {
+        width: 100%;
+        max-width: 1500px;
+        margin: 2rem auto; /* Espaciado antes del footer */
+        padding: 0 1.5rem;
+      }
+      
+      .banner-link img {
+        width: 100%;
+        height: auto; /* Mantiene la proporción de la imagen 1500x214 */
+        display: block;
+        border-radius: var(--radio-borde);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 BannerVertical.vue
+      --- Contenido del Archivo ---
+      <template>
+        <aside class="banner-vertical-container">
+          <a
+            v-if="patrocinador"
+            :href="patrocinador.enlace"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="banner-vertical-link"
+            :title="`Patrocinador: ${patrocinador.nombre}`"
+          >
+            <img :src="patrocinador.imagen" :alt="`Publicidad de ${patrocinador.nombre}`" />
+          </a>
+          <div v-else class="placeholder">Espacio Publicitario</div>
+        </aside>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      // --- CAMBIO IMPORTANTE ---
+      // Ahora importamos desde el archivo específico para banners verticales.
+      import { listaPatrocinadoresVerticales } from '@/data/patrocinadoresVertical.js'
+      
+      const patrocinador = ref(null)
+      
+      onMounted(() => {
+        // Y usamos la lista correcta.
+        if (listaPatrocinadoresVerticales && listaPatrocinadoresVerticales.length > 0) {
+          const randomIndex = Math.floor(Math.random() * listaPatrocinadoresVerticales.length)
+          patrocinador.value = listaPatrocinadoresVerticales[randomIndex]
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* Los estilos de este componente no necesitan cambiar */
+      .banner-vertical-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        width: 100%;
+        max-width: 214px;
+        margin: 1rem auto;
+      }
+      
+      .banner-vertical-link img {
+        display: block;
+        width: 214px;
+        height: auto;
+        max-height: 1500px;
+        object-fit: contain;
+        border-radius: var(--radio-borde, 8px);
+        background-color: var(--color-superficie, #1c1c1c);
+        transition: transform 0.3s ease;
+      }
+      
+      .banner-vertical-link img:hover {
+        transform: scale(1.02);
+      }
+      
+      .placeholder {
+        width: 214px;
+        height: 600px;
+        background-color: var(--color-superficie, #1c1c1c);
+        border: 2px dashed var(--color-borde, #2a2a2a);
+        border-radius: var(--radio-borde, 8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--color-texto-secundario, #a0a0a0);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 EncuestaActiva.vue
+      --- Contenido del Archivo ---
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore' // <- 'increment' ya no es necesario
+      import { db } from '@/firebase/config'
+      
+      const encuesta = ref(null)
+      const cargando = ref(true)
+      const haVotado = ref(false)
+      
+      onMounted(async () => {
+        const q = query(collection(db, "encuestas"), where("estaActiva", "==", true));
+        const querySnapshot = await getDocs(q);
+      
+        if (!querySnapshot.empty) {
+          const docSnapshot = querySnapshot.docs[0];
+          encuesta.value = { id: docSnapshot.id, ...docSnapshot.data() };
+        }
+        cargando.value = false;
+      })
+      
+      // --- INICIO DE LA FUNCIÓN CORREGIDA ---
+      const votar = async (indiceOpcion) => {
+        if (haVotado.value) {
+          alert('Ya has votado en esta encuesta.');
+          return;
+        }
+      
+        try {
+          const encuestaDocRef = doc(db, 'encuestas', encuesta.value.id);
+      
+          // 1. Creamos una copia del array de opciones para modificarla de forma segura
+          const opcionesActualizadas = [...encuesta.value.opciones];
+      
+          // 2. Le sumamos 1 al contador de la opción que el usuario eligió
+          opcionesActualizadas[indiceOpcion].votos++;
+      
+          // 3. Reemplazamos el array 'opciones' en Firestore con nuestro nuevo array modificado
+          await updateDoc(encuestaDocRef, {
+            opciones: opcionesActualizadas
+          });
+      
+          // 4. Actualizamos el estado local para reflejar el cambio al instante
+          encuesta.value.opciones = opcionesActualizadas;
+          haVotado.value = true;
+      
+        } catch (error) {
+          console.error("Error al votar:", error);
+          alert('Hubo un error al registrar tu voto.');
+        }
+      }
+      // --- FIN DE LA FUNCIÓN CORREGIDA ---
+      </script>
+      
+      <template>
+        <div class="encuesta-widget" v-if="!cargando && encuesta">
+          <h3>{{ encuesta.pregunta || 'Pregunta no disponible' }}</h3>
+          
+          <!-- Comprobamos si el array de opciones existe y tiene elementos -->
+          <ul v-if="Array.isArray(encuesta.opciones) && encuesta.opciones.length > 0">
+            <li v-for="(opcion, index) in encuesta.opciones" :key="index" @click="!haVotado && votar(index)" :class="{ 'votado': haVotado }">
+              <!-- Si opcion.texto no existe, mostramos 'Opción sin texto'. Si opcion.votos no existe, mostramos 0. -->
+              <span class="texto-opcion">{{ opcion.texto || 'Opción sin texto' }}</span>
+              <span class="votos" v-if="haVotado"> ({{ opcion.votos || 0 }} votos)</span>
+            </li>
+          </ul>
+           <div v-else>
+            <p>Esta encuesta aún no tiene opciones para votar.</p>
+          </div>
+      
+          <p v-if="haVotado" class="gracias-voto">¡Gracias por tu voto!</p>
+        </div>
+      </template>
+      
+      <style scoped>
+      .encuesta-widget {
+        background-color: var(--color-superficie);
+        padding: 1.5rem;
+        border-radius: var(--radio-borde);
+        margin-top: 2rem;
+      }
+      h3 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      ul {
+        list-style: none;
+      }
+      li {
+        background-color: var(--color-fondo);
+        border: 1px solid var(--color-texto-secundario);
+        padding: 0.8rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: flex;
+        justify-content: space-between;
+      }
+      li:not(.votado):hover {
+        background-color: #333;
+        border-color: var(--color-primario);
+      }
+      li.votado {
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+      .gracias-voto {
+        text-align: center;
+        color: var(--color-primario);
+        margin-top: 1rem;
+        font-weight: bold;
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 NoticiaCard.vue
+      --- Contenido del Archivo ---
+      <template>
+        <RouterLink :to="{ name: 'noticia-detalle', params: { id: noticia.id } }" class="noticia-card">
+          <div class="card-imagen">
+            <!-- Idealmente aquí iría una imagen de la noticia -->
+            <img src="@/assets/images/logo.png" alt="Imagen de la noticia" />
+          </div>
+          <div class="card-contenido">
+            <h3>{{ noticia.titulo }}</h3>
+            <p>{{ noticia.resumen }}</p>
+            <span class="ver-mas">Leer más &rarr;</span>
+          </div>
+        </RouterLink>
+      </template>
+      
+      <script setup>
+      import { RouterLink } from 'vue-router'
+      
+      defineProps({
+        noticia: {
+          type: Object,
+          required: true,
+        },
+      })
+      </script>
+      
+      <style scoped>
+      .noticia-card {
+        display: block;
+        background-color: var(--color-superficie);
+        border-radius: var(--radio-borde);
+        overflow: hidden;
+        border: 1px solid var(--color-borde);
+        transition:
+          transform 0.3s ease,
+          border-color 0.3s ease;
+        color: var(--color-texto-principal);
+        text-decoration: none;
+      }
+      
+      .noticia-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-primario);
+      }
+      
+      .card-imagen img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+      }
+      
+      .card-contenido {
+        padding: 1.5rem;
+      }
+      
+      .card-contenido h3 {
+        margin-bottom: 0.5rem;
+        color: var(--color-texto-principal);
+      }
+      
+      .card-contenido p {
+        color: var(--color-texto-secundario);
+        margin-bottom: 1rem;
+      }
+      
+      .ver-mas {
+        color: var(--color-primario);
+        font-weight: bold;
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 SubHeader.vue
+      --- Contenido del Archivo ---
+      <!-- src/components/SubHeader.vue -->
+      <template>
+        <nav class="sub-header">
+          <div class="nav-links">
+            <RouterLink to="/" class="nav-link">Inicio</RouterLink>
+            <RouterLink to="/noticias" class="nav-link">Noticias</RouterLink>
+            <RouterLink to="/descargas" class="nav-link">Descargas</RouterLink>
+          </div>
+        </nav>
+      </template>
+      
+      <style scoped>
+      .sub-header {
+        position: sticky;
+        top: var(--header-height);
+        z-index: 999;
+        background-color: var(--color-fondo); /* Mismo color que el fondo general */
+        border-bottom: 1px solid var(--color-borde);
+        width: 100%;
+        height: var(--subheader-height);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .nav-links {
+        display: flex;
+        height: 100%;
+      }
+      
+      .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        color: var(--color-texto-secundario);
+        text-decoration: none;
+        font-weight: 500; /* Un peso de fuente medio */
+        font-size: 0.95rem;
+        border-bottom: 2px solid transparent; /* Espacio para el indicador activo */
+        transition: all 0.2s ease;
+      }
+      
+      .nav-link:hover {
+        color: var(--color-texto-principal);
+        background-color: var(--color-superficie);
+      }
+      
+      /* Indicador de página activa: una línea dorada debajo */
+      .router-link-exact-active {
+        color: var(--color-primario);
+        font-weight: 700;
+        border-bottom-color: var(--color-primario);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📂 icons/
+      📄 IconCommunity.vue
+        --- Contenido del Archivo ---
+        <template>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+            <path
+              d="M15 4a1 1 0 1 0 0 2V4zm0 11v-1a1 1 0 0 0-1 1h1zm0 4l-.707.707A1 1 0 0 0 16 19h-1zm-4-4l.707-.707A1 1 0 0 0 11 14v1zm-4.707-1.293a1 1 0 0 0-1.414 1.414l1.414-1.414zm-.707.707l-.707-.707.707.707zM9 11v-1a1 1 0 0 0-.707.293L9 11zm-4 0h1a1 1 0 0 0-1-1v1zm0 4H4a1 1 0 0 0 1.707.707L5 15zm10-9h2V4h-2v2zm2 0a1 1 0 0 1 1 1h2a3 3 0 0 0-3-3v2zm1 1v6h2V7h-2zm0 6a1 1 0 0 1-1 1v2a3 3 0 0 0 3-3h-2zm-1 1h-2v2h2v-2zm-3 1v4h2v-4h-2zm1.707 3.293l-4-4-1.414 1.414 4 4 1.414-1.414zM11 14H7v2h4v-2zm-4 0c-.276 0-.525-.111-.707-.293l-1.414 1.414C5.42 15.663 6.172 16 7 16v-2zm-.707 1.121l3.414-3.414-1.414-1.414-3.414 3.414 1.414 1.414zM9 12h4v-2H9v2zm4 0a3 3 0 0 0 3-3h-2a1 1 0 0 1-1 1v2zm3-3V3h-2v6h2zm0-6a3 3 0 0 0-3-3v2a1 1 0 0 1 1 1h2zm-3-3H3v2h10V0zM3 0a3 3 0 0 0-3 3h2a1 1 0 0 1 1-1V0zM0 3v6h2V3H0zm0 6a3 3 0 0 0 3 3v-2a1 1 0 0 1-1-1H0zm3 3h2v-2H3v2zm1-1v4h2v-4H4zm1.707 4.707l.586-.586-1.414-1.414-.586.586 1.414 1.414z"
+            />
+          </svg>
+        </template>
+        --- Fin del Contenido ---
+
+      📄 IconDocumentation.vue
+        --- Contenido del Archivo ---
+        <template>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor">
+            <path
+              d="M11 2.253a1 1 0 1 0-2 0h2zm-2 13a1 1 0 1 0 2 0H9zm.447-12.167a1 1 0 1 0 1.107-1.666L9.447 3.086zM1 2.253L.447 1.42A1 1 0 0 0 0 2.253h1zm0 13H0a1 1 0 0 0 1.553.833L1 15.253zm8.447.833a1 1 0 1 0 1.107-1.666l-1.107 1.666zm0-14.666a1 1 0 1 0 1.107 1.666L9.447 1.42zM19 2.253h1a1 1 0 0 0-.447-.833L19 2.253zm0 13l-.553.833A1 1 0 0 0 20 15.253h-1zm-9.553-.833a1 1 0 1 0 1.107 1.666L9.447 14.42zM9 2.253v13h2v-13H9zm1.553-.833C9.203.523 7.42 0 5.5 0v2c1.572 0 2.961.431 3.947 1.086l1.107-1.666zM5.5 0C3.58 0 1.797.523.447 1.42l1.107 1.666C2.539 2.431 3.928 2 5.5 2V0zM0 2.253v13h2v-13H0zm1.553 13.833C2.539 15.431 3.928 15 5.5 15v-2c-1.92 0-3.703.523-5.053 1.42l1.107 1.666zM5.5 15c1.572 0 2.961.431 3.947 1.086l1.107-1.666C9.203 13.523 7.42 13 5.5 13v2zm5.053-11.914C11.539 2.431 12.928 2 14.5 2V0c-1.92 0-3.703.523-5.053 1.42l1.107 1.666zM14.5 2c1.573 0 2.961.431 3.947 1.086l1.107-1.666C18.203.523 16.421 0 14.5 0v2zm3.5.253v13h2v-13h-2zm1.553 12.167C18.203 13.523 16.421 13 14.5 13v2c1.573 0 2.961.431 3.947 1.086l1.107-1.666zM14.5 13c-1.92 0-3.703.523-5.053 1.42l1.107 1.666C11.539 15.431 12.928 15 14.5 15v-2z"
+            />
+          </svg>
+        </template>
+        --- Fin del Contenido ---
+
+      📄 IconEcosystem.vue
+        --- Contenido del Archivo ---
+        <template>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="currentColor">
+            <path
+              d="M11.447 8.894a1 1 0 1 0-.894-1.789l.894 1.789zm-2.894-.789a1 1 0 1 0 .894 1.789l-.894-1.789zm0 1.789a1 1 0 1 0 .894-1.789l-.894 1.789zM7.447 7.106a1 1 0 1 0-.894 1.789l.894-1.789zM10 9a1 1 0 1 0-2 0h2zm-2 2.5a1 1 0 1 0 2 0H8zm9.447-5.606a1 1 0 1 0-.894-1.789l.894 1.789zm-2.894-.789a1 1 0 1 0 .894 1.789l-.894-1.789zm2 .789a1 1 0 1 0 .894-1.789l-.894 1.789zm-1.106-2.789a1 1 0 1 0-.894 1.789l.894-1.789zM18 5a1 1 0 1 0-2 0h2zm-2 2.5a1 1 0 1 0 2 0h-2zm-5.447-4.606a1 1 0 1 0 .894-1.789l-.894 1.789zM9 1l.447-.894a1 1 0 0 0-.894 0L9 1zm-2.447.106a1 1 0 1 0 .894 1.789l-.894-1.789zm-6 3a1 1 0 1 0 .894 1.789L.553 4.106zm2.894.789a1 1 0 1 0-.894-1.789l.894 1.789zm-2-.789a1 1 0 1 0-.894 1.789l.894-1.789zm1.106 2.789a1 1 0 1 0 .894-1.789l-.894 1.789zM2 5a1 1 0 1 0-2 0h2zM0 7.5a1 1 0 1 0 2 0H0zm8.553 12.394a1 1 0 1 0 .894-1.789l-.894 1.789zm-1.106-2.789a1 1 0 1 0-.894 1.789l.894-1.789zm1.106 1a1 1 0 1 0 .894 1.789l-.894-1.789zm2.894.789a1 1 0 1 0-.894-1.789l.894 1.789zM8 19a1 1 0 1 0 2 0H8zm2-2.5a1 1 0 1 0-2 0h2zm-7.447.394a1 1 0 1 0 .894-1.789l-.894 1.789zM1 15H0a1 1 0 0 0 .553.894L1 15zm1-2.5a1 1 0 1 0-2 0h2zm12.553 2.606a1 1 0 1 0 .894 1.789l-.894-1.789zM17 15l.447.894A1 1 0 0 0 18 15h-1zm1-2.5a1 1 0 1 0-2 0h2zm-7.447-5.394l-2 1 .894 1.789 2-1-.894-1.789zm-1.106 1l-2-1-.894 1.789 2 1 .894-1.789zM8 9v2.5h2V9H8zm8.553-4.894l-2 1 .894 1.789 2-1-.894-1.789zm.894 0l-2-1-.894 1.789 2 1 .894-1.789zM16 5v2.5h2V5h-2zm-4.553-3.894l-2-1-.894 1.789 2 1 .894-1.789zm-2.894-1l-2 1 .894 1.789 2-1L8.553.106zM1.447 5.894l2-1-.894-1.789-2 1 .894 1.789zm-.894 0l2 1 .894-1.789-2-1-.894 1.789zM0 5v2.5h2V5H0zm9.447 13.106l-2-1-.894 1.789 2 1 .894-1.789zm0 1.789l2-1-.894-1.789-2 1 .894 1.789zM10 19v-2.5H8V19h2zm-6.553-3.894l-2-1-.894 1.789 2 1 .894-1.789zM2 15v-2.5H0V15h2zm13.447 1.894l2-1-.894-1.789-2 1 .894 1.789zM18 15v-2.5h-2V15h2z"
+            />
+          </svg>
+        </template>
+        --- Fin del Contenido ---
+
+      📄 IconSupport.vue
+        --- Contenido del Archivo ---
+        <template>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+            <path
+              d="M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.666.105 5.5 5.5 0 0 0-.114 7.665L10 18.78l8.39-8.4a5.5 5.5 0 0 0-.114-7.665 5.5 5.5 0 0 0-7.666-.105l-.61.61z"
+            />
+          </svg>
+        </template>
+        --- Fin del Contenido ---
+
+      📄 IconTooling.vue
+        --- Contenido del Archivo ---
+        <!-- This icon is from <https://github.com/Templarian/MaterialDesign>, distributed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0) license-->
+        <template>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            aria-hidden="true"
+            role="img"
+            class="iconify iconify--mdi"
+            width="24"
+            height="24"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 18v-4h-3v1h-2v-1H9v1H7v-1H4v4h16M6.33 8l-1.74 4H7v-1h2v1h6v-1h2v1h2.41l-1.74-4H6.33M9 5v1h6V5H9m12.84 7.61c.1.22.16.48.16.8V18c0 .53-.21 1-.6 1.41c-.4.4-.85.59-1.4.59H4c-.55 0-1-.19-1.4-.59C2.21 19 2 18.53 2 18v-4.59c0-.32.06-.58.16-.8L4.5 7.22C4.84 6.41 5.45 6 6.33 6H7V5c0-.55.18-1 .57-1.41C7.96 3.2 8.44 3 9 3h6c.56 0 1.04.2 1.43.59c.39.41.57.86.57 1.41v1h.67c.88 0 1.49.41 1.83 1.22l2.34 5.39z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </template>
+        --- Fin del Contenido ---
+
+  📂 data/
+    📄 patrocinadoresHorizontal.js
+      --- Contenido del Archivo ---
+      // src/data/patrocinadoresHorizontal.js
+      
+      // Importa las imágenes de la carpeta de banners horizontales.
+      import CostiBarber from '@/assets/patrocinadores-horizontal/CostiBarber.png'
+      // (cuando añadas un nuevo logo horizontal, impórtalo aquí)
+      
+      // Exporta la lista específica para banners horizontales.
+      export const listaPatrocinadoresHorizontales = [
+        {
+          id: 'h1', // Usamos 'h' para 'horizontal'
+          nombre: 'CostiBarber (Horizontal)',
+          enlace: 'https://www.instagram.com/costi.barberr',
+          imagen: CostiBarber, // Usa la variable importada
+        },
+        // Añade más patrocinadores horizontales aquí
+      ]
+      --- Fin del Contenido ---
+
+    📄 patrocinadoresVertical.js
+      --- Contenido del Archivo ---
+      // src/data/patrocinadoresVertical.js
+      
+      // Importa las imágenes de la carpeta de banners verticales.
+      import CostiBarberVertical from '@/assets/patrocinadores-vertical/CostiBarberVertical.png'
+      // (cuando añadas un nuevo logo vertical, impórtalo aquí)
+      
+      // Exporta la lista específica para banners verticales.
+      export const listaPatrocinadoresVerticales = [
+        {
+          id: 'v1', // Usamos 'v' para 'vertical'
+          nombre: 'CostiBarber (Vertical)',
+          enlace: 'https://www.instagram.com/costi.barberr',
+          imagen: CostiBarberVertical, // Usa la variable importada
+        },
+        // Añade más patrocinadores verticales aquí
+      ]
+      --- Fin del Contenido ---
+
+  📂 firebase/
+    📄 config.js
+      --- Contenido del Archivo ---
+      // src/firebase/config.js
+      
+      import { initializeApp } from 'firebase/app'
+      import { getFirestore } from 'firebase/firestore'
+      import { getAuth } from 'firebase/auth'
+      
+      // ¡ESTE ES EL ARCHIVO IMPORTANTE AHORA!
+      // La conexión a Firebase se establece aquí con estas claves.
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAXfKdc6dfdi0ZxV-aIMzi_cRD654asPU4',
+        authDomain: 'pes6balcarce2026.firebaseapp.com',
+        projectId: 'pes6balcarce2026',
+        storageBucket: 'pes6balcarce2026.appspot.com',
+        messagingSenderId: '896058552329',
+        appId: '1:896058552329:web:35790a6652671130c108d8',
+        measurementId: 'G-KQ25EKH280',
+      }
+      
+      const app = initializeApp(firebaseConfig)
+      const db = getFirestore(app)
+      const auth = getAuth(app)
+      
+      export { db, auth }
+      --- Fin del Contenido ---
+
+  📂 layouts/
+    📄 AdminLayout.vue
+      --- Contenido del Archivo ---
+      <script setup>
+      import { useRouter, RouterLink, RouterView } from 'vue-router'
+      import { signOut } from 'firebase/auth'
+      import { auth } from '@/firebase/config'
+      
+      const router = useRouter()
+      
+      const logout = () => {
+        signOut(auth).then(() => {
+          router.push('/admin/login')
+        })
+      }
+      </script>
+      
+      <template>
+        <div class="admin-layout">
+          <aside class="admin-sidebar">
+            <h2>PES6 Admin</h2>
+            <nav>
+              <RouterLink to="/admin/dashboard">Dashboard</RouterLink>
+              <RouterLink to="/admin/noticias">Gestionar Noticias</RouterLink>
+              <!-- <-- AÑADIR ESTE ENLACE -->
+              <RouterLink to="/admin/encuestas">Gestionar Encuestas</RouterLink>
+              <RouterLink to="/admin/jugadores">Gestionar Jugadores</RouterLink>
+              <RouterLink to="/admin/versiones">Versiones del Parche</RouterLink>
+            </nav>
+            <button @click="logout" class="logout-btn">Cerrar Sesión</button>
+          </aside>
+          <main class="admin-content">
+            <RouterView />
+          </main>
+        </div>
+      </template>
+      
+      <style scoped>
+      .admin-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .admin-sidebar {
+        width: 250px;
+        background-color: var(--color-superficie);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-sidebar h2 {
+        color: var(--color-primario);
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .admin-sidebar nav {
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-sidebar nav a {
+        color: var(--color-texto-principal);
+        text-decoration: none;
+        padding: 1rem;
+        border-radius: var(--radio-borde);
+        margin-bottom: 0.5rem;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+      .admin-sidebar nav a:hover {
+        background-color: #333;
+      }
+      .admin-sidebar nav a.router-link-exact-active {
+        background-color: var(--color-primario);
+        color: var(--color-fondo);
+      }
+      .logout-btn {
+        margin-top: auto;
+        padding: 0.7rem;
+        background-color: #c53030;
+        color: white;
+        border: none;
+        border-radius: var(--radio-borde);
+        cursor: pointer;
+      }
+      .admin-content {
+        flex: 1;
+        padding: 2rem;
+        background-color: var(--color-fondo);
+        overflow-x: hidden; /* Evita desbordamiento horizontal */
+      }
+      
+      /* --- INICIO DE ESTILOS RESPONSIVE --- */
+      @media (max-width: 768px) {
+        .admin-layout {
+          flex-direction: column; /* Apila el menú y el contenido */
+        }
+        .admin-sidebar {
+          width: 100%;
+          height: auto;
+          flex-direction: row; /* Pone los elementos del menú en horizontal */
+          align-items: center;
+          justify-content: space-between;
+          padding: 1rem;
+        }
+        .admin-sidebar h2 {
+          margin-bottom: 0;
+          font-size: 1.2rem;
+        }
+        .admin-sidebar nav {
+          flex-direction: row; /* Los enlaces de navegación en fila */
+          order: 2; /* Cambia el orden para que el botón de logout aparezca al final */
+          display: none; /* Ocultamos la navegación principal en móvil por simplicidad, se puede mejorar con un menú hamburguesa */
+        }
+        .logout-btn {
+          margin-top: 0;
+          order: 3;
+        }
+        .admin-content {
+          padding: 1rem;
+        }
+      }
+      /* --- FIN DE ESTILOS RESPONSIVE --- */
+      </style>
+      --- Fin del Contenido ---
+
+  📂 router/
+    📄 index.js
+      --- Contenido del Archivo ---
+      // src/router/index.js
+      
+      import { createRouter, createWebHistory } from 'vue-router'
+      import { onAuthStateChanged } from 'firebase/auth'
+      import { auth } from '@/firebase/config'
+      
+      // Vistas Públicas
+      import HomeView from '../views/HomeView.vue'
+      import NoticiasView from '../views/NoticiasView.vue'
+      import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
+      import DescargasView from '@/views/DescargasView.vue'
+      import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
+      
+      // Vistas de Autenticación y Perfil de Usuario
+      import RegistroView from '@/views/RegistroView.vue'
+      import LoginView from '@/views/LoginView.vue'
+      import PerfilView from '@/views/PerfilView.vue'
+      
+      // Vistas y Layout del Admin
+      import AdminLayout from '@/layouts/AdminLayout.vue'
+      import AdminLoginView from '../views/admin/AdminLoginView.vue'
+      import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
+      import AdminEncuestasView from '@/views/admin/AdminEncuestasView.vue'
+      import AdminJugadoresView from '@/views/admin/AdminJugadoresView.vue'
+      import AdminNoticiasView from '@/views/admin/AdminNoticiasView.vue'
+      import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue' // <-- ESTA ES LA LÍNEA QUE FALTABA
+      import AdminVersionesView from '@/views/admin/AdminVersionesView.vue' // <-- Importación para la nueva vista de admin
+      
+      const router = createRouter({
+        history: createWebHistory(import.meta.env.BASE_URL),
+        routes: [
+          // --- Rutas Públicas y de Usuario ---
+          { path: '/', name: 'home', component: HomeView },
+          { path: '/descargas', name: 'descargas', component: DescargasView },
+          {
+            path: '/descargas/historial',
+            name: 'historial-versiones',
+            component: HistorialVersionesView,
+          },
+          { path: '/noticias', name: 'noticias', component: NoticiasView },
+          { path: '/noticias/:id', name: 'noticia-detalle', component: NoticiaDetalleView, props: true },
+          { path: '/registro', name: 'registro', component: RegistroView },
+          { path: '/login', name: 'login', component: LoginView },
+          {
+            path: '/perfil',
+            name: 'perfil',
+            component: PerfilView,
+            meta: { requiresAuth: true },
+          },
+      
+          // --- Rutas de Administración ---
+          { path: '/admin/login', name: 'admin-login', component: AdminLoginView },
+          {
+            path: '/admin',
+            component: AdminLayout,
+            meta: { requiresAuth: true },
+            children: [
+              { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboardView },
+              { path: 'encuestas', name: 'admin-encuestas', component: AdminEncuestasView },
+              { path: 'jugadores', name: 'admin-jugadores', component: AdminJugadoresView },
+              { path: 'noticias', name: 'admin-noticias', component: AdminNoticiasView },
+              {
+                path: 'patrocinadores',
+                name: 'admin-patrocinadores',
+                component: AdminPatrocinadoresView,
+              },
+              { path: 'versiones', name: 'admin-versiones', component: AdminVersionesView },
+            ],
+          },
+        ],
+      })
+      
+      // El guardián de rutas se queda exactamente igual
+      const getCurrentUser = () => {
+        return new Promise((resolve, reject) => {
+          const removeListener = onAuthStateChanged(
+            auth,
+            (user) => {
+              removeListener()
+              resolve(user)
+            },
+            reject,
+          )
+        })
+      }
+      
+      router.beforeEach(async (to, from, next) => {
+        const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+        const isAdminRoute = to.path.startsWith('/admin/')
+        const currentUser = await getCurrentUser()
+      
+        if (requiresAuth && !currentUser) {
+          if (isAdminRoute) {
+            next({ name: 'admin-login' })
+          } else {
+            next({ name: 'login' })
+          }
+        } else {
+          next()
+        }
+      })
+      
+      export default router
+      --- Fin del Contenido ---
+
+  📂 stores/
+    📄 counter.js
+      --- Contenido del Archivo ---
+      import { ref, computed } from 'vue'
+      import { defineStore } from 'pinia'
+      
+      export const useCounterStore = defineStore('counter', () => {
+        const count = ref(0)
+        const doubleCount = computed(() => count.value * 2)
+        function increment() {
+          count.value++
+        }
+      
+        return { count, doubleCount, increment }
+      })
+      --- Fin del Contenido ---
+
+  📂 views/
+    📄 DescargasView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/DescargasView.vue -->
+      <template>
+        <div class="descargas-view">
+          <div v-if="cargando" class="mensaje-central">Buscando la última versión...</div>
+          <div v-else-if="!versionReciente" class="mensaje-central">
+            Aún no se ha publicado ninguna versión.
+          </div>
+      
+          <template v-else>
+            <header class="page-header">
+              <h1>Descarga la Versión Más Reciente</h1>
+              <p>¡Aquí tienes la última actualización del parche lista para instalar!</p>
+            </header>
+      
+            <!-- BANNER SUPERIOR -->
+            <BannerPatrocinador />
+      
+            <div class="version-card version-mas-reciente">
+              <div class="version-header">
+                <h2>{{ versionReciente.nombre }} <span class="badge">Última Versión</span></h2>
+                <small
+                  >Publicado el:
+                  {{
+                    new Date(versionReciente.fechaPublicacion.seconds * 1000).toLocaleDateString()
+                  }}</small
+                >
+              </div>
+              <div class="version-body">
+                <h3>Novedades en esta versión:</h3>
+                <ul class="changelog">
+                  <li v-for="(item, index) in versionReciente.changelog" :key="index">{{ item }}</li>
+                </ul>
+              </div>
+              <div class="version-footer">
+                <a
+                  :href="versionReciente.enlace"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-descarga"
+                  >Descargar Ahora</a
+                >
+              </div>
+            </div>
+      
+            <!-- BANNER INFERIOR -->
+            <BannerPatrocinador />
+      
+            <div class="historial-link-container">
+              <RouterLink to="/descargas/historial" class="btn-historial"
+                >Ver Historial de Versiones Anteriores</RouterLink
+              >
+            </div>
+          </template>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { db } from '@/firebase/config'
+      import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+      // Importamos el componente del banner
+      import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+      
+      const versionReciente = ref(null)
+      const cargando = ref(true)
+      
+      onMounted(async () => {
+        try {
+          const q = query(collection(db, 'versiones'), orderBy('fechaPublicacion', 'desc'), limit(1))
+          const querySnapshot = await getDocs(q)
+          if (!querySnapshot.empty) {
+            versionReciente.value = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() }
+          }
+        } catch (error) {
+          console.error('Error al obtener la última versión:', error)
+        } finally {
+          cargando.value = false
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* Los estilos de esta página no necesitan cambios */
+      .descargas-view {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .page-header h1 {
+        color: var(--color-primario);
+      }
+      .page-header p {
+        color: var(--color-texto-secundario);
+        font-size: 1.1rem;
+      }
+      .mensaje-central {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: var(--color-texto-secundario);
+      }
+      .version-card {
+        background-color: var(--color-superficie);
+        border: 2px solid var(--color-primario);
+        border-radius: var(--radio-borde);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(232, 185, 67, 0.2);
+      }
+      .version-header {
+        padding: 1rem 1.5rem;
+        background-color: rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .version-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--color-texto-principal);
+      }
+      .version-header small {
+        color: var(--color-texto-secundario);
+      }
+      .badge {
+        background-color: var(--color-primario);
+        color: #121212;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.5rem;
+        font-weight: bold;
+      }
+      .version-body {
+        padding: 1.5rem;
+      }
+      .version-body h3 {
+        margin-top: 0;
+        color: var(--color-primario);
+      }
+      .changelog {
+        list-style-type: '✓ ';
+        padding-left: 1.5rem;
+        color: var(--color-texto-principal);
+      }
+      .changelog li {
+        margin-bottom: 0.5rem;
+      }
+      .version-footer {
+        padding: 1rem 1.5rem;
+        text-align: right;
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+      .btn-descarga {
+        display: inline-block;
+        background-color: var(--color-primario);
+        color: #121212;
+        padding: 0.75rem 2rem;
+        border-radius: var(--radio-borde);
+        font-weight: bold;
+        text-decoration: none;
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+      .btn-descarga:hover {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+      }
+      .historial-link-container {
+        text-align: center;
+        margin-top: 2rem;
+      }
+      .btn-historial {
+        color: var(--color-texto-secundario);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--color-texto-secundario);
+        padding-bottom: 4px;
+        transition: color 0.2s;
+      }
+      .btn-historial:hover {
+        color: var(--color-primario);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 HistorialVersionesView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/HistorialVersionesView.vue -->
+      <template>
+        <div class="historial-view">
+          <header class="page-header">
+            <h1>Historial de Versiones</h1>
+            <p>Todas las publicaciones del parche, desde la más reciente a la más antigua.</p>
+            <RouterLink to="/descargas" class="btn-volver">&larr; Volver a la última versión</RouterLink>
+          </header>
+      
+          <div v-if="cargando" class="mensaje-central">Cargando historial...</div>
+          <div v-else class="versiones-lista">
+            <template v-for="(version, index) in versiones" :key="version.id">
+              <!-- 1. Renderizamos la tarjeta de la versión -->
+              <div class="version-card">
+                <div class="version-header">
+                  <h3>{{ version.nombre }}</h3>
+                  <small
+                    >Publicado el:
+                    {{ new Date(version.fechaPublicacion.seconds * 1000).toLocaleDateString() }}</small
+                  >
+                </div>
+                <div class="version-body">
+                  <h4>Novedades:</h4>
+                  <ul class="changelog">
+                    <li v-for="(item, index) in version.changelog" :key="index">{{ item }}</li>
+                  </ul>
+                </div>
+                <div class="version-footer">
+                  <a
+                    :href="version.enlace"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-descarga btn-secundario"
+                  >
+                    Descargar esta versión
+                  </a>
+                </div>
+              </div>
+      
+              <!-- 2. Insertamos un banner después de cada tarjeta (excepto la última) -->
+              <BannerPatrocinador v-if="index < versiones.length - 1" />
+            </template>
+          </div>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { db } from '@/firebase/config'
+      import { collection, getDocs, query, orderBy } from 'firebase/firestore'
+      // Importamos el componente del banner
+      import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+      
+      const versiones = ref([])
+      const cargando = ref(true)
+      
+      onMounted(async () => {
+        try {
+          const q = query(collection(db, 'versiones'), orderBy('fechaPublicacion', 'desc'))
+          const querySnapshot = await getDocs(q)
+          versiones.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        } catch (error) {
+          console.error('Error al obtener el historial de versiones:', error)
+        } finally {
+          cargando.value = false
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* Los estilos de esta página no necesitan cambios */
+      .historial-view {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .page-header h1 {
+        color: var(--color-primario);
+      }
+      .page-header p {
+        color: var(--color-texto-secundario);
+        font-size: 1.1rem;
+      }
+      .btn-volver {
+        display: inline-block;
+        margin-top: 1rem;
+        color: var(--color-primario);
+        text-decoration: none;
+      }
+      .mensaje-central {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: var(--color-texto-secundario);
+      }
+      .version-card {
+        background-color: var(--color-superficie);
+        border: 1px solid #2a2a2a;
+        border-radius: var(--radio-borde);
+      }
+      /* Quitamos el margen inferior de la tarjeta para que el banner quede pegado */
+      .versiones-lista > template > .version-card {
+        margin-bottom: 0;
+      }
+      .version-header {
+        padding: 1rem 1.5rem;
+        background-color: rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .version-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--color-texto-principal);
+      }
+      .version-header small {
+        color: var(--color-texto-secundario);
+      }
+      .version-body {
+        padding: 1.5rem;
+      }
+      .version-body h4 {
+        margin-top: 0;
+        color: var(--color-primario);
+      }
+      .changelog {
+        list-style-type: '✓ ';
+        padding-left: 1.5rem;
+        color: var(--color-texto-principal);
+      }
+      .changelog li {
+        margin-bottom: 0.5rem;
+      }
+      .version-footer {
+        padding: 1rem 1.5rem;
+        text-align: right;
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+      .btn-descarga {
+        display: inline-block;
+        background-color: var(--color-primario);
+        color: #121212;
+        padding: 0.75rem 2rem;
+        border-radius: var(--radio-borde);
+        font-weight: bold;
+        text-decoration: none;
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+      .btn-secundario {
+        background-color: transparent;
+        border: 2px solid var(--color-primario);
+        color: var(--color-primario);
+      }
+      .btn-descarga:hover {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 HomeView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/HomeView.vue -->
+      <template>
+        <div>
+          <!-- SECCIÓN HERO (Sin cambios) -->
+          <section class="hero">
+            <div class="hero-content">
+              <h1 class="hero-title">Liga Balcarceña de Fútbol</h1>
+              <p class="hero-subtitle">
+                El parche definitivo para PES 6, trayendo la pasión local a la gloria digital.
+              </p>
+              <RouterLink to="/descargas" class="hero-button">Descargar Última Versión</RouterLink>
+            </div>
+          </section>
+      
+          <!-- CONTENIDO PRINCIPAL DE LA PÁGINA -->
+          <div class="page-container home-content">
+            <main class="main-column">
+              <h3>Últimas Noticias</h3>
+      
+              <!-- Lógica para mostrar noticias -->
+              <div v-if="cargandoNoticias" class="loading-state">Cargando noticias...</div>
+              <div v-else-if="ultimasNoticias.length === 0" class="empty-state">
+                No hay noticias para mostrar.
+              </div>
+      
+              <template v-else>
+                <!-- Iteramos sobre las noticias y colocamos un banner entre cada una -->
+                <template v-for="(noticia, index) in ultimasNoticias" :key="noticia.id">
+                  <!-- Tarjeta de Noticia -->
+                  <RouterLink :to="`/noticias/${noticia.id}`" class="noticia-card-home">
+                    <div class="card-content">
+                      <h4>{{ noticia.titulo }}</h4>
+                      <p>{{ noticia.contenido.substring(0, 120) }}...</p>
+                      <small>{{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}</small>
+                    </div>
+                  </RouterLink>
+      
+                  <!-- Banner de Patrocinador -->
+                  <BannerPatrocinador v-if="index < ultimasNoticias.length - 1" />
+                </template>
+              </template>
+            </main>
+      
+            <aside class="sidebar-column">
+              <h3>Accesos Rápidos</h3>
+              <div class="quick-links">
+                <!-- Hemos eliminado el de "Once Ideal" como pediste -->
+                <RouterLink to="/descargas/historial" class="quick-link-card">
+                  <h4>📚 Historial de Versiones</h4>
+                  <p>Revisa todas las actualizaciones.</p>
+                </RouterLink>
+                <RouterLink to="/registro" class="quick-link-card">
+                  <h4>👤 Crear Cuenta</h4>
+                  <p>Únete a la comunidad del parche.</p>
+                </RouterLink>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { db } from '@/firebase/config'
+      import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+      import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+      
+      // Variables reactivas para las noticias y el estado de carga
+      const ultimasNoticias = ref([])
+      const cargandoNoticias = ref(true)
+      
+      // onMounted se ejecuta cuando el componente se carga por primera vez
+      onMounted(async () => {
+        try {
+          // 1. Creamos una consulta a la colección 'noticias'
+          const q = query(
+            collection(db, 'noticias'),
+            orderBy('creadoEn', 'desc'), // 2. Ordenamos por fecha de creación, descendente (más nuevas primero)
+            limit(3), // 3. Limitamos el resultado a solo 3 noticias
+          )
+      
+          // 4. Ejecutamos la consulta
+          const querySnapshot = await getDocs(q)
+      
+          // 5. Mapeamos los resultados y los guardamos en nuestra variable
+          ultimasNoticias.value = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        } catch (error) {
+          console.error('Error al obtener las últimas noticias:', error)
+        } finally {
+          // 6. Indicamos que la carga ha terminado (incluso si hubo un error)
+          cargandoNoticias.value = false
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* --- Estilos de la Sección Hero y Generales (Sin cambios) --- */
+      .hero {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 60vh;
+        padding: 2rem;
+        background-image: url('https://via.placeholder.com/1920x1080/1c1c1c/E8B943?text=IMAGEN+DEL+JUEGO');
+        background-size: cover;
+        background-position: center;
+        color: white;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(16, 16, 16, 1), rgba(16, 16, 16, 0.3));
+      }
+      .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+      }
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      }
+      .hero-subtitle {
+        font-size: 1.25rem;
+        margin-top: 1rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .hero-button {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 1rem 2.5rem;
+        background-color: var(--color-primario);
+        color: #101010;
+        font-weight: 700;
+        border-radius: 50px;
+        text-transform: uppercase;
+        font-size: 1rem;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .hero-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(232, 185, 67, 0.4);
+      }
+      .home-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      @media (min-width: 992px) {
+        .home-content {
+          grid-template-columns: 2fr 1fr;
+        }
+      }
+      .main-column h3,
+      .sidebar-column h3 {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--color-borde);
+      }
+      .main-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .sidebar-column .quick-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .quick-link-card {
+        display: block;
+        background-color: var(--color-superficie);
+        padding: 1.5rem;
+        border-radius: var(--radio-borde);
+        border: 1px solid var(--color-borde);
+        color: var(--color-texto-principal);
+        transition: border-color 0.2s ease;
+      }
+      .quick-link-card:hover {
+        border-color: var(--color-primario);
+      }
+      .quick-link-card h4 {
+        color: var(--color-primario);
+        margin: 0 0 0.5rem 0;
+      }
+      .quick-link-card p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--color-texto-secundario);
+      }
+      
+      /* --- NUEVOS ESTILOS PARA LAS TARJETAS DE NOTICIAS --- */
+      .noticia-card-home {
+        display: block;
+        background-color: var(--color-superficie);
+        border-radius: var(--radio-borde);
+        border: 1px solid var(--color-borde);
+        color: var(--color-texto-principal);
+        text-decoration: none;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .noticia-card-home:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-primario);
+      }
+      .noticia-card-home .card-content {
+        padding: 1.5rem;
+      }
+      .noticia-card-home h4 {
+        margin: 0 0 0.75rem 0;
+        color: var(
+          --color-texto-principal
+        ); /* Título en blanco para diferenciar de los de la barra lateral */
+      }
+      .noticia-card-home p {
+        margin: 0 0 1rem 0;
+        font-size: 0.95rem;
+        color: var(--color-texto-secundario);
+      }
+      .noticia-card-home small {
+        font-size: 0.85rem;
+        color: #666;
+      }
+      
+      .loading-state,
+      .empty-state {
+        color: var(--color-texto-secundario);
+        text-align: center;
+        padding: 2rem;
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 LoginView.vue
+      --- Contenido del Archivo ---
+      <script setup>
+      import { ref } from 'vue'
+      import { useRouter } from 'vue-router'
+      import { signInWithEmailAndPassword } from 'firebase/auth'
+      import { auth } from '@/firebase/config'
+      
+      const email = ref('')
+      const password = ref('')
+      const errorMsg = ref(null)
+      const router = useRouter()
+      
+      const login = async () => {
+        try {
+          await signInWithEmailAndPassword(auth, email.value, password.value)
+          router.push('/') // Redirige a la página de inicio tras un login exitoso
+        } catch (error) {
+          errorMsg.value = 'Email o contraseña incorrectos.'
+          console.error("Error de login:", error);
+        }
+      }
+      </script>
+      
+      <template>
+        <div class="form-container">
+          <h2>Iniciar Sesión</h2>
+          <form @submit.prevent="login">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" v-model="email" required>
+            </div>
+            <div class="form-group">
+              <label for="password">Contraseña</label>
+              <input type="password" v-model="password" required>
+            </div>
+            <button type="submit" class="btn-principal">Ingresar</button>
+            <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
+          </form>
+        </div>
+      </template>
+      
+      <style scoped>
+      .form-container { max-width: 450px; margin: 3rem auto; padding: 2rem; background-color: var(--color-superficie); border-radius: var(--radio-borde); }
+      .form-group { margin-bottom: 1.5rem; }
+      label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+      input { width: 100%; padding: 0.8rem; background-color: var(--color-fondo); border: 1px solid var(--color-texto-secundario); color: var(--color-texto-principal); border-radius: 4px; }
+      .btn-principal { width: 100%; padding: 0.8rem; background-color: var(--color-primario); color: var(--color-fondo); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+      .error { color: red; margin-top: 1rem; text-align: center;}
+      </style>
+      --- Fin del Contenido ---
+
+    📄 NoticiaDetalleView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/NoticiaDetalleView.vue -->
+      <template>
+        <div class="noticia-detalle-view">
+          <div v-if="noticia" class="noticia-contenido">
+            <header class="noticia-header">
+              <h1>{{ noticia.titulo }}</h1>
+              <p class="fecha-publicacion">
+                Publicado el {{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}
+              </p>
+            </header>
+      
+            <!-- CUERPO DE LA NOTICIA DINÁMICO CON BANNERS -->
+            <div class="noticia-cuerpo">
+              <!-- Iteramos sobre los segmentos de texto que hemos creado -->
+              <template v-for="(segmento, index) in segmentosDeContenido" :key="index">
+                <!-- Renderizamos el segmento de texto -->
+                <!-- Usamos v-html para que los saltos de línea se conviertan en párrafos -->
+                <div v-html="formatearParrafos(segmento)"></div>
+      
+                <!-- Si este no es el último segmento, insertamos un banner -->
+                <BannerPatrocinador v-if="index < segmentosDeContenido.length - 1" />
+              </template>
+            </div>
+          </div>
+      
+          <div v-else class="mensaje-carga">Cargando noticia...</div>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted, computed } from 'vue'
+      import { useRoute } from 'vue-router'
+      import { db } from '@/firebase/config'
+      import { doc, getDoc } from 'firebase/firestore'
+      import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+      
+      const noticia = ref(null)
+      const route = useRoute()
+      
+      onMounted(async () => {
+        const noticiaId = route.params.id
+        try {
+          const docRef = doc(db, 'noticias', noticiaId)
+          const docSnap = await getDoc(docRef)
+      
+          if (docSnap.exists()) {
+            noticia.value = docSnap.data()
+          } else {
+            console.error('No se encontró la noticia!')
+          }
+        } catch (error) {
+          console.error('Error al obtener la noticia:', error)
+        }
+      })
+      
+      // ¡NUEVA LÓGICA MEJORADA!
+      const segmentosDeContenido = computed(() => {
+        if (noticia.value && noticia.value.contenido) {
+          // 1. Dividimos el contenido usando '...' como separador.
+          return noticia.value.contenido.split('...')
+        }
+        return []
+      })
+      
+      // Nueva función para convertir los saltos de línea de cada segmento en párrafos HTML
+      const formatearParrafos = (texto) => {
+        if (!texto) return ''
+        // 1. Quitamos espacios en blanco al principio y al final.
+        // 2. Dividimos por dobles saltos de línea para crear un array de párrafos.
+        // 3. Envolvemos cada elemento del array en etiquetas <p>.
+        // 4. Unimos todo de nuevo en un solo string HTML.
+        return texto
+          .trim()
+          .split(/\n\s*\n/) // Expresión regular que busca uno o más saltos de línea
+          .map((parrafo) => `<p>${parrafo.replace(/\n/g, '<br>')}</p>`) // Reemplaza saltos simples con <br>
+          .join('')
+      }
+      </script>
+      
+      <style scoped>
+      .noticia-detalle-view {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem;
+      }
+      
+      .mensaje-carga {
+        text-align: center;
+        font-size: 1.5rem;
+        color: var(--color-texto-secundario);
+        padding: 4rem 0;
+      }
+      
+      .noticia-header {
+        text-align: center;
+        border-bottom: 2px solid var(--color-primario);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      
+      .noticia-header h1 {
+        margin-bottom: 1rem;
+        color: var(--color-texto-principal);
+      }
+      
+      .fecha-publicacion {
+        color: var(--color-texto-secundario);
+        font-style: italic;
+      }
+      
+      .noticia-cuerpo {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        color: var(--color-texto-principal);
+      }
+      
+      /* Estilos para los párrafos generados por v-html */
+      .noticia-cuerpo :deep(p) {
+        margin-bottom: 1.5rem;
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 NoticiasView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/NoticiasView.vue -->
+      <template>
+        <div class="noticias-view">
+          <header class="page-header">
+            <h1>Noticias</h1>
+            <p>Todas las novedades sobre el parche y la comunidad.</p>
+          </header>
+      
+          <div v-if="cargando" class="mensaje-central">Cargando noticias...</div>
+          <div v-else-if="noticias.length === 0" class="mensaje-central">No hay noticias publicadas.</div>
+      
+          <div v-else class="noticias-grid">
+            <!-- Usamos un <template> para poder insertar el banner entre las noticias sin romper la estructura -->
+            <template v-for="(noticia, index) in noticias" :key="noticia.id">
+              <!-- 1. Renderizamos la tarjeta de la noticia -->
+              <RouterLink :to="`/noticias/${noticia.id}`" class="noticia-card">
+                <div class="card-content">
+                  <h2>{{ noticia.titulo }}</h2>
+                  <p>{{ noticia.contenido.substring(0, 100) }}...</p>
+                  <small>{{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}</small>
+                </div>
+              </RouterLink>
+      
+              <!-- 2. Después de cada 2 noticias, insertamos un banner -->
+              <BannerPatrocinador v-if="(index + 1) % 2 === 0 && index < noticias.length - 1" />
+            </template>
+          </div>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { db } from '@/firebase/config'
+      import { collection, getDocs, query, orderBy } from 'firebase/firestore'
+      // Importamos el componente del banner
+      import BannerPatrocinador from '@/components/BannerPatrocinador.vue'
+      
+      const noticias = ref([])
+      const cargando = ref(true)
+      
+      onMounted(async () => {
+        try {
+          const q = query(collection(db, 'noticias'), orderBy('creadoEn', 'desc'))
+          const querySnapshot = await getDocs(q)
+          noticias.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        } catch (error) {
+          console.error('Error al obtener noticias:', error)
+        } finally {
+          cargando.value = false
+        }
+      })
+      </script>
+      
+      <style scoped>
+      /* Estilos para que la vista de noticias se vea bien */
+      .noticias-view {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .page-header h1 {
+        color: var(--color-primario);
+      }
+      .page-header p {
+        color: var(--color-texto-secundario);
+        font-size: 1.1rem;
+      }
+      .mensaje-central {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: var(--color-texto-secundario);
+      }
+      
+      .noticias-grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Una columna por defecto */
+        gap: 1.5rem;
+      }
+      
+      .noticia-card {
+        background-color: var(--color-superficie);
+        border: 1px solid #2a2a2a;
+        border-radius: var(--radio-borde);
+        text-decoration: none;
+        color: var(--color-texto-principal);
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .noticia-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-primario);
+      }
+      .card-content {
+        padding: 1.5rem;
+      }
+      .card-content h2 {
+        margin-top: 0;
+        color: var(--color-primario);
+      }
+      .card-content p {
+        color: var(--color-texto-secundario);
+      }
+      .card-content small {
+        display: block;
+        margin-top: 1rem;
+        text-align: right;
+        color: var(--color-texto-secundario);
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 PerfilView.vue
+      --- Contenido del Archivo ---
+      <!-- src/views/PerfilView.vue -->
+      <template>
+        <div class="perfil-view">
+          <div v-if="user" class="profile-card">
+            <header class="card-header">
+              <div class="avatar">
+                <!-- Mostramos la primera letra del email como avatar por defecto -->
+                <span>{{ user.email.charAt(0).toUpperCase() }}</span>
+              </div>
+              <h1>Mi Perfil</h1>
+            </header>
+      
+            <div class="card-body">
+              <div class="info-item">
+                <span class="label">Email de la Cuenta</span>
+                <span class="value">{{ user.email }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Miembro Desde</span>
+                <!-- Mostramos la fecha de creación de la cuenta -->
+                <span class="value">{{ new Date(user.metadata.creationTime).toLocaleDateString() }}</span>
+              </div>
+              <!-- Aquí podrías añadir más información del perfil en el futuro -->
+            </div>
+      
+            <footer class="card-footer">
+              <button @click="handleLogout" class="btn-logout">Cerrar Sesión</button>
+            </footer>
+          </div>
+      
+          <div v-else class="loading-message">Cargando perfil...</div>
+        </div>
+      </template>
+      
+      <script setup>
+      import { ref, onMounted, onUnmounted } from 'vue'
+      import { useRouter } from 'vue-router'
+      import { auth } from '@/firebase/config'
+      import { onAuthStateChanged, signOut } from 'firebase/auth'
+      
+      const user = ref(null)
+      const router = useRouter()
+      let unsubscribeAuth
+      
+      onMounted(() => {
+        // Escuchamos cambios para asegurarnos de que el usuario está cargado
+        unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+          user.value = currentUser
+        })
+      })
+      
+      onUnmounted(() => {
+        if (unsubscribeAuth) {
+          unsubscribeAuth()
+        }
+      })
+      
+      // --- LÓGICA PARA CERRAR SESIÓN ---
+      const handleLogout = async () => {
+        try {
+          await signOut(auth)
+          // Redirigimos al usuario a la página de inicio después de cerrar sesión
+          router.push('/')
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error)
+          alert('Hubo un error al intentar cerrar sesión.')
+        }
+      }
+      </script>
+      
+      <style scoped>
+      .perfil-view {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem 1rem;
+      }
+      
+      .profile-card {
+        width: 100%;
+        max-width: 600px;
+        background-color: var(--color-superficie);
+        border-radius: var(--radio-borde);
+        border: 1px solid #2a2a2a;
+        overflow: hidden;
+        box-shadow: var(--sombra-suave);
+      }
+      
+      .card-header {
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid #2a2a2a;
+      }
+      
+      .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: var(--color-primario);
+        color: #121212;
+        font-size: 3rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 1.5rem auto;
+        border: 4px solid var(--color-superficie);
+      }
+      
+      .card-header h1 {
+        margin: 0;
+        color: var(--color-texto-principal);
+      }
+      
+      .card-body {
+        padding: 2rem;
+      }
+      
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid #2a2a2a;
+      }
+      .info-item:last-child {
+        border-bottom: none;
+      }
+      
+      .label {
+        color: var(--color-texto-secundario);
+        font-weight: bold;
+      }
+      
+      .value {
+        color: var(--color-texto-principal);
+      }
+      
+      .card-footer {
+        padding: 1.5rem;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+      
+      .btn-logout {
+        background-color: #c0392b;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: var(--radio-borde);
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .btn-logout:hover {
+        background-color: #e74c3c;
+      }
+      
+      .loading-message {
+        color: var(--color-texto-secundario);
+        font-size: 1.5rem;
+      }
+      </style>
+      --- Fin del Contenido ---
+
+    📄 RegistroView.vue
+      --- Contenido del Archivo ---
+      <script setup>
+      import { ref } from 'vue'
+      import { useRouter } from 'vue-router'
+      import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+      import { doc, setDoc } from 'firebase/firestore'
+      import { auth, db } from '@/firebase/config'
+      
+      const username = ref('')
+      const email = ref('')
+      const password = ref('')
+      const errorMsg = ref(null)
+      const router = useRouter()
+      
+      const registrar = async () => {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
+          const user = userCredential.user
+      
+          // 1. Actualizamos el perfil de Firebase Auth para que tenga un nombre visible
+          await updateProfile(user, {
+            displayName: username.value
+          })
+      
+          // 2. Creamos un documento en nuestra base de datos 'users' para guardar datos extra como las medallas
+          await setDoc(doc(db, "users", user.uid), {
+            username: username.value,
+            medals: [] // Empezamos con un array de medallas vacío
+          });
+      
+          // 3. Redirigimos al usuario a la página de inicio
+          router.push('/')
+      
+        } catch (error) {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMsg.value = 'Este correo electrónico ya está en uso.'
+              break;
+            case 'auth/weak-password':
+              errorMsg.value = 'La contraseña debe tener al menos 6 caracteres.'
+              break;
+            default:
+              errorMsg.value = 'Hubo un error al crear la cuenta.'
+          }
+          console.error("Error de registro:", error);
+        }
+      }
+      </script>
+      
+      <template>
+        <div class="form-container">
+          <h2>Crear una Cuenta</h2>
+          <p>El registro es opcional, pero te permite tener un perfil y ganar medallas.</p>
+          <form @submit.prevent="registrar">
+            <div class="form-group">
+              <label>Nombre de Usuario</label>
+              <input type="text" v-model="username" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" v-model="email" required>
+            </div>
+            <div class="form-group">
+              <label>Contraseña</label>
+              <input type="password" v-model="password" required>
+            </div>
+            <button type="submit" class="btn-principal">Registrarse</button>
+            <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
+          </form>
+        </div>
+      </template>
+      
+      <style scoped>
+      .form-container { max-width: 450px; margin: 3rem auto; padding: 2rem; background-color: var(--color-superficie); border-radius: var(--radio-borde); }
+      .form-container p { color: var(--color-texto-secundario); margin-bottom: 2rem; }
+      .form-group { margin-bottom: 1.5rem; }
+      label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+      input { width: 100%; padding: 0.8rem; background-color: var(--color-fondo); border: 1px solid var(--color-texto-secundario); color: var(--color-texto-principal); border-radius: 4px; }
+      .btn-principal { width: 100%; padding: 0.8rem; background-color: var(--color-primario); color: var(--color-fondo); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+      .error { color: red; margin-top: 1rem; text-align: center;}
+      </style>
+      --- Fin del Contenido ---
+
+    📂 admin/
+      📄 AdminDashboardView.vue
+        --- Contenido del Archivo ---
+        <script setup>
+        import { ref } from 'vue'
+        import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+        import { db } from '@/firebase/config'
+        
+        // Lógica para el formulario de encuestas
+        const nuevaEncuestaPregunta = ref('')
+        const nuevaEncuestaOpciones = ref([
+          { texto: '' },
+          { texto: '' }
+        ])
+        const mensajeExito = ref('')
+        
+        const agregarOpcion = () => {
+          nuevaEncuestaOpciones.value.push({ texto: '' })
+        }
+        
+        const crearEncuesta = async () => {
+          if (nuevaEncuestaPregunta.value.trim() === '') {
+            alert('La pregunta no puede estar vacía.')
+            return
+          }
+        
+          const opcionesValidas = nuevaEncuestaOpciones.value
+            .map(op => ({ texto: op.texto.trim(), votos: 0 }))
+            .filter(op => op.texto !== '')
+        
+          if (opcionesValidas.length < 2) {
+            alert('Debe haber al menos dos opciones válidas.')
+            return
+          }
+        
+          try {
+            // Añadimos el nuevo documento a la colección 'encuestas'
+            await addDoc(collection(db, 'encuestas'), {
+              pregunta: nuevaEncuestaPregunta.value,
+              opciones: opcionesValidas,
+              estaActiva: true, // La marcamos como activa por defecto
+              fechaCreacion: serverTimestamp()
+            })
+        
+            mensajeExito.value = '¡Encuesta creada con éxito!'
+            // Limpiamos el formulario
+            nuevaEncuestaPregunta.value = ''
+            nuevaEncuestaOpciones.value = [{ texto: '' }, { texto: '' }]
+            
+            setTimeout(() => mensajeExito.value = '', 3000) // Ocultar mensaje después de 3s
+        
+          } catch (error) {
+            console.error("Error al crear la encuesta:", error);
+            alert('Hubo un error al crear la encuesta.')
+          }
+        }
+        </script>
+        
+        <template>
+          <div class="dashboard">
+            <h1>Dashboard Principal</h1>
+            <p>Desde aquí puedes ver un resumen general y realizar acciones rápidas.</p>
+            
+            <section class="widget">
+              <h2>Crear Nueva Encuesta</h2>
+              <form @submit.prevent="crearEncuesta">
+                <div class="form-group">
+                  <label for="pregunta">Pregunta de la Encuesta</label>
+                  <input type="text" v-model="nuevaEncuestaPregunta" id="pregunta" placeholder="Ej: ¿Quién fue la figura de la fecha?">
+                </div>
+        
+                <div class="form-group">
+                  <label>Opciones</label>
+                  <div v-for="(opcion, index) in nuevaEncuestaOpciones" :key="index" class="opcion-input">
+                    <input type="text" v-model="opcion.texto" :placeholder="`Opción ${index + 1}`">
+                  </div>
+                  <button type="button" @click="agregarOpcion" class="btn-secundario">Añadir Opción</button>
+                </div>
+                
+                <button type="submit" class="btn-principal">Crear Encuesta</button>
+              </form>
+              <p v-if="mensajeExito" class="mensaje-exito">{{ mensajeExito }}</p>
+            </section>
+          </div>
+        </template>
+        
+        <style scoped>
+        /* Estilos generales del dashboard */
+        .dashboard h1 {
+          margin-bottom: 0.5rem;
+        }
+        .dashboard p {
+          margin-bottom: 2rem;
+          color: var(--color-texto-secundario);
+        }
+        
+        /* Estilos de los widgets o secciones */
+        .widget {
+          background-color: var(--color-superficie);
+          padding: 2rem;
+          border-radius: var(--radio-borde);
+        }
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+        input {
+          width: 100%;
+          padding: 0.8rem;
+          background-color: var(--color-fondo);
+          border: 1px solid var(--color-texto-secundario);
+          color: var(--color-texto-principal);
+          border-radius: 4px;
+        }
+        .opcion-input {
+          margin-bottom: 0.5rem;
+        }
+        
+        /* Estilos de botones */
+        .btn-principal {
+          width: 100%;
+          padding: 0.8rem;
+          background-color: var(--color-primario);
+          color: var(--color-fondo);
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 1rem;
+        }
+        .btn-secundario {
+          padding: 0.5rem 1rem;
+          background-color: transparent;
+          border: 1px solid var(--color-primario);
+          color: var(--color-primario);
+          border-radius: 4px;
+          cursor: pointer;
+          margin-top: 0.5rem;
+        }
+        .mensaje-exito {
+          color: var(--color-primario);
+          margin-top: 1rem;
+          text-align: center;
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminEncuestasView.vue
+        --- Contenido del Archivo ---
+        <script setup>
+        import { ref, onMounted, computed } from 'vue'
+        import { collection, getDocs, doc, writeBatch, deleteDoc, orderBy, query } from 'firebase/firestore'
+        import { db } from '@/firebase/config'
+        
+        const encuestas = ref([])
+        const cargando = ref(true)
+        
+        // Función para obtener los datos cuando el componente se carga
+        onMounted(async () => {
+          const q = query(collection(db, "encuestas"), orderBy("fechaCreacion", "desc"));
+          const querySnapshot = await getDocs(q);
+          encuestas.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          cargando.value = false;
+        });
+        
+        // Función para activar una encuesta (y desactivar las demás)
+        const activarEncuesta = async (idEncuestaActivar) => {
+          const batch = writeBatch(db);
+          encuestas.value.forEach(encuesta => {
+            const docRef = doc(db, 'encuestas', encuesta.id);
+            const debeEstarActiva = encuesta.id === idEncuestaActivar;
+            batch.update(docRef, { estaActiva: debeEstarActiva });
+          });
+          await batch.commit();
+          // Actualizamos el estado local para reflejar el cambio al instante
+          encuestas.value.forEach(enc => enc.estaActiva = (enc.id === idEncuestaActivar));
+        }
+        
+        // Función para eliminar una encuesta
+        const eliminarEncuesta = async (idEncuestaEliminar) => {
+          if (confirm('¿Estás seguro de que quieres eliminar esta encuesta? Esta acción es irreversible.')) {
+            await deleteDoc(doc(db, "encuestas", idEncuestaEliminar));
+            // Eliminamos la encuesta del array local
+            encuestas.value = encuestas.value.filter(enc => enc.id !== idEncuestaEliminar);
+          }
+        }
+        
+        // Funciones para los gráficos
+        const calcularTotalVotos = (encuesta) => {
+          return encuesta.opciones.reduce((total, opcion) => total + opcion.votos, 0);
+        }
+        const calcularPorcentaje = (votos, total) => {
+          if (total === 0) return 0;
+          return (votos / total) * 100;
+        }
+        </script>
+        
+        <template>
+          <div>
+            <h1>Gestionar Encuestas</h1>
+            <div v-if="cargando">Cargando encuestas...</div>
+            <div v-else class="encuestas-lista">
+              <div v-for="encuesta in encuestas" :key="encuesta.id" class="encuesta-card">
+                <h4>{{ encuesta.pregunta || 'Pregunta no disponible' }} <span :class="['status', { active: encuesta.estaActiva }]">{{ encuesta.estaActiva ? 'Activa' : 'Inactiva' }}</span></h4>
+                
+                <div class="resultados">
+                  <!-- Comprobamos si el array de opciones existe y tiene elementos -->
+                  <div v-if="Array.isArray(encuesta.opciones) && encuesta.opciones.length > 0">
+                    <div v-for="(opcion, index) in encuesta.opciones" :key="index" class="opcion-resultado">
+                      <div class="info">
+                        <!-- Si opcion.texto no existe, mostramos 'Opción sin texto'. Si opcion.votos no existe, mostramos 0. -->
+                        <span>{{ opcion.texto || 'Opción sin texto' }}</span>
+                        <span>{{ opcion.votos || 0 }} votos</span>
+                      </div>
+                      <div class="barra-grafico">
+                        <div class="barra-progreso" :style="{ width: calcularPorcentaje(opcion.votos || 0, calcularTotalVotos(encuesta)) + '%' }"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <p>Esta encuesta no tiene opciones configuradas.</p>
+                  </div>
+                </div>
+        
+                <div class="acciones">
+                  <button v-if="!encuesta.estaActiva" @click="activarEncuesta(encuesta.id)" class="btn-activar">Activar</button>
+                  <button @click="eliminarEncuesta(encuesta.id)" class="btn-eliminar">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        
+        <style scoped>
+        .encuestas-lista {
+          display: grid;
+          gap: 1.5rem;
+          margin-top: 2rem;
+        }
+        .encuesta-card {
+          background-color: var(--color-superficie);
+          padding: 1.5rem;
+          border-radius: var(--radio-borde);
+        }
+        .encuesta-card h4 {
+          font-size: 1.2rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          justify-content: space-between;
+        }
+        .status {
+          font-size: 0.8rem;
+          padding: 0.2rem 0.5rem;
+          border-radius: 10px;
+          background-color: #555;
+        }
+        .status.active {
+          background-color: var(--color-primario);
+          color: var(--color-fondo);
+        }
+        .opcion-resultado {
+          margin-bottom: 1rem;
+        }
+        .info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.25rem;
+          font-size: 0.9rem;
+        }
+        .barra-grafico {
+          height: 20px;
+          width: 100%;
+          background-color: var(--color-fondo);
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        .barra-progreso {
+          height: 100%;
+          background-color: var(--color-primario);
+          border-radius: 10px;
+          transition: width 0.5s ease;
+        }
+        .acciones {
+          margin-top: 1.5rem;
+          display: flex;
+          gap: 1rem;
+        }
+        .acciones button {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: var(--radio-borde);
+          cursor: pointer;
+        }
+        .btn-activar {
+          background-color: var(--color-primario);
+          color: var(--color-fondo);
+        }
+        .btn-eliminar {
+          background-color: #c53030;
+          color: white;
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminJugadoresView.vue
+        --- Contenido del Archivo ---
+        <!-- src/views/admin/AdminJugadoresView.vue -->
+        <template>
+          <div class="admin-jugadores">
+            <h1>Gestión de Jugadores</h1>
+        
+            <!-- CAMBIO: Hemos añadido todos los campos a la estructura definitiva del formulario -->
+            <form @submit.prevent="guardarJugador" class="form-card">
+              <h2>{{ editando ? 'Editar Jugador' : 'Añadir Nuevo Jugador' }}</h2>
+        
+              <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" v-model="nuevoJugador.nombre" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="apellido">Apellido</label>
+                <input type="text" v-model="nuevoJugador.apellido" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="posicion">Posición</label>
+                <input type="text" v-model="nuevoJugador.posicion" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="equipo">Equipo</label>
+                <input type="text" v-model="nuevoJugador.equipo" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="numero">Número de Camiseta</label>
+                <input type="number" v-model.number="nuevoJugador.numero" required />
+              </div>
+        
+              <div class="form-actions">
+                <button type="submit">{{ editando ? 'Actualizar Jugador' : 'Guardar Jugador' }}</button>
+                <button type="button" v-if="editando" @click="cancelarEdicion">Cancelar</button>
+              </div>
+            </form>
+        
+            <!-- La lista de jugadores no cambia -->
+            <div class="lista-jugadores">
+              <h2>Plantel Actual</h2>
+              <div v-if="cargando">Cargando jugadores...</div>
+              <div v-else-if="jugadores.length === 0">No hay jugadores añadidos.</div>
+              <div v-else class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Número</th>
+                      <th>Nombre Completo</th>
+                      <th>Posición</th>
+                      <th>Equipo</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="jugador in jugadores" :key="jugador.id">
+                      <td>{{ jugador.numero }}</td>
+                      <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
+                      <td>{{ jugador.posicion }}</td>
+                      <td>{{ jugador.equipo }}</td>
+                      <td class="acciones">
+                        <button @click="editarJugador(jugador)">Editar</button>
+                        <button @click="eliminarJugador(jugador.id)" class="btn-eliminar">Eliminar</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </template>
+        
+        <script setup>
+        import { ref, onMounted } from 'vue'
+        import { db } from '@/firebase/config'
+        import {
+          collection,
+          addDoc,
+          getDocs,
+          doc,
+          deleteDoc,
+          updateDoc,
+          query,
+          orderBy,
+        } from 'firebase/firestore'
+        
+        // --- CAMBIO CLAVE: DEFINIMOS LA ESTRUCTURA POR DEFECTO ---
+        const crearJugadorPorDefecto = () => ({
+          nombre: '',
+          apellido: '',
+          posicion: '',
+          equipo: '',
+          numero: null,
+          vecesSeleccionado: 0, // Lo inicializamos siempre en 0
+        })
+        
+        const jugadores = ref([])
+        const cargando = ref(true)
+        const editando = ref(false)
+        const jugadorId = ref(null)
+        // Inicializamos el formulario con la estructura limpia
+        const nuevoJugador = ref(crearJugadorPorDefecto())
+        
+        const fetchJugadores = async () => {
+          cargando.value = true
+          const q = query(collection(db, 'jugadores'), orderBy('numero', 'asc'))
+          const querySnapshot = await getDocs(q)
+          jugadores.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          cargando.value = false
+        }
+        
+        onMounted(fetchJugadores)
+        
+        const guardarJugador = async () => {
+          // Creamos un objeto limpio para enviar, asegurando que tenga la estructura correcta
+          const jugadorParaGuardar = {
+            nombre: nuevoJugador.value.nombre,
+            apellido: nuevoJugador.value.apellido,
+            posicion: nuevoJugador.value.posicion,
+            equipo: nuevoJugador.value.equipo,
+            numero: nuevoJugador.value.numero,
+            // Mantenemos el valor de vecesSeleccionado si estamos editando, o lo ponemos en 0 si es nuevo
+            vecesSeleccionado: nuevoJugador.value.vecesSeleccionado || 0,
+          }
+        
+          if (editando.value) {
+            const docRef = doc(db, 'jugadores', jugadorId.value)
+            await updateDoc(docRef, jugadorParaGuardar)
+          } else {
+            await addDoc(collection(db, 'jugadores'), jugadorParaGuardar)
+          }
+          resetForm()
+          await fetchJugadores()
+        }
+        
+        const editarJugador = (jugador) => {
+          editando.value = true
+          jugadorId.value = jugador.id
+          // Usamos la estructura por defecto para asegurarnos de que todos los campos existan en el formulario
+          nuevoJugador.value = { ...crearJugadorPorDefecto(), ...jugador }
+        }
+        
+        const eliminarJugador = async (id) => {
+          if (confirm('¿Estás seguro de que quieres eliminar este jugador?')) {
+            await deleteDoc(doc(db, 'jugadores', id))
+            await fetchJugadores()
+          }
+        }
+        
+        const resetForm = () => {
+          editando.value = false
+          jugadorId.value = null
+          // Al resetear, SIEMPRE volvemos a la estructura limpia y por defecto
+          nuevoJugador.value = crearJugadorPorDefecto()
+        }
+        
+        const cancelarEdicion = () => {
+          resetForm()
+        }
+        </script>
+        
+        <style scoped>
+        /* Los estilos no necesitan cambios, son genéricos */
+        .admin-jugadores {
+          color: var(--color-texto-principal);
+        }
+        .form-card,
+        .lista-jugadores {
+          background-color: var(--color-superficie);
+          padding: 2rem;
+          border-radius: var(--radio-borde);
+          margin-top: 1.5rem;
+        }
+        .form-group {
+          margin-bottom: 1rem;
+        }
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+        input[type='text'],
+        input[type='number'] {
+          width: 100%;
+          padding: 0.75rem;
+          background-color: var(--color-fondo);
+          border: 1px solid #444;
+          border-radius: var(--radio-borde);
+          color: var(--color-texto-principal);
+        }
+        .form-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+        button {
+          background-color: var(--color-primario);
+          color: #121212;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: var(--radio-borde);
+          cursor: pointer;
+          font-weight: bold;
+        }
+        .table-container {
+          overflow-x: auto;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th,
+        td {
+          padding: 1rem;
+          border-bottom: 1px solid #444;
+          text-align: left;
+        }
+        th {
+          color: var(--color-primario);
+        }
+        .acciones {
+          display: flex;
+          gap: 0.5rem;
+        }
+        .btn-eliminar {
+          background-color: #c0392b;
+          color: white;
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminLoginView.vue
+        --- Contenido del Archivo ---
+        <script setup>
+        import { ref } from 'vue'
+        import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+        import { useRouter } from 'vue-router'
+        
+        const email = ref('')
+        const password = ref('')
+        const errorMsg = ref(null)
+        const router = useRouter()
+        
+        const login = () => {
+          const auth = getAuth()
+          signInWithEmailAndPassword(auth, email.value, password.value)
+            .then((userCredential) => {
+              // Login exitoso, redirigir al panel
+              router.push('/admin/dashboard')
+            })
+            .catch((error) => {
+              // Manejar errores
+              errorMsg.value = 'Email o contraseña incorrectos.'
+              console.error("Error de autenticación:", error);
+            });
+        }
+        </script>
+        
+        <template>
+          <div class="login-container">
+            <h2>Panel de Administración - Login</h2>
+            <form @submit.prevent="login">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" v-model="email" required>
+              </div>
+              <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" v-model="password" required>
+              </div>
+              <button type="submit">Ingresar</button>
+              <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
+            </form>
+          </div>
+        </template>
+        
+        <style scoped>
+        .login-container {
+          max-width: 400px;
+          margin: 5rem auto;
+          padding: 2rem;
+          background-color: var(--color-superficie);
+          border-radius: var(--radio-borde);
+        }
+        .form-group {
+          margin-bottom: 1rem;
+        }
+        input {
+          width: 100%;
+          padding: 0.5rem;
+          background-color: var(--color-fondo);
+          border: 1px solid var(--color-texto-secundario);
+          color: var(--color-texto-principal);
+          border-radius: 4px;
+        }
+        button {
+          width: 100%;
+          padding: 0.7rem;
+          background-color: var(--color-primario);
+          color: var(--color-fondo);
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+        .error {
+          color: red;
+          margin-top: 1rem;
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminNoticiasView.vue
+        --- Contenido del Archivo ---
+        <!-- src/views/admin/AdminNoticiasView.vue -->
+        <template>
+          <div class="admin-noticias">
+            <h1>Gestión de Noticias</h1>
+        
+            <!-- Formulario para crear/editar noticias -->
+            <form @submit.prevent="guardarNoticia" class="form-card">
+              <h2>{{ editando ? 'Editar Noticia' : 'Crear Nueva Noticia' }}</h2>
+        
+              <div class="form-group">
+                <label for="titulo">Título</label>
+                <input type="text" v-model="nuevaNoticia.titulo" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="contenido">Contenido</label>
+                <textarea v-model="nuevaNoticia.contenido" rows="5" required></textarea>
+              </div>
+        
+              <div class="form-actions">
+                <button type="submit">{{ editando ? 'Actualizar Noticia' : 'Guardar Noticia' }}</button>
+                <button type="button" v-if="editando" @click="cancelarEdicion">Cancelar Edición</button>
+              </div>
+            </form>
+        
+            <!-- Lista de noticias existentes -->
+            <div class="lista-noticias">
+              <h2>Noticias Actuales</h2>
+        
+              <!-- AQUÍ ESTÁ LA CORRECCIÓN -->
+              <div v-if="cargando">Cargando noticias...</div>
+        
+              <div v-else-if="noticias.length === 0">No hay noticias para mostrar.</div>
+        
+              <!-- El `v-else` principal está en este div -->
+              <div v-else class="table-container">
+                <!-- La tabla ya NO necesita un v-else -->
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Fecha</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="noticia in noticias" :key="noticia.id">
+                      <td>{{ noticia.titulo }}</td>
+                      <td>{{ new Date(noticia.creadoEn.seconds * 1000).toLocaleDateString() }}</td>
+                      <td class="acciones">
+                        <button @click="editarNoticia(noticia)">Editar</button>
+                        <button @click="eliminarNoticia(noticia.id)" class="btn-eliminar">Eliminar</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- FIN DE LA CORRECCIÓN -->
+            </div>
+          </div>
+        </template>
+        
+        <script setup>
+        import { ref, onMounted } from 'vue'
+        import { db } from '@/firebase/config'
+        import {
+          collection,
+          addDoc,
+          getDocs,
+          doc,
+          deleteDoc,
+          updateDoc,
+          query,
+          orderBy,
+        } from 'firebase/firestore'
+        
+        const noticias = ref([])
+        const cargando = ref(true)
+        const editando = ref(false)
+        const noticiaId = ref(null)
+        
+        const nuevaNoticia = ref({
+          titulo: '',
+          contenido: '',
+        })
+        
+        // Obtener noticias de Firestore
+        const fetchNoticias = async () => {
+          cargando.value = true
+          const q = query(collection(db, 'noticias'), orderBy('creadoEn', 'desc'))
+          const querySnapshot = await getDocs(q)
+          noticias.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          cargando.value = false
+        }
+        
+        onMounted(fetchNoticias)
+        
+        // Guardar o actualizar noticia
+        const guardarNoticia = async () => {
+          if (editando.value) {
+            // Actualizar
+            const docRef = doc(db, 'noticias', noticiaId.value)
+            await updateDoc(docRef, {
+              titulo: nuevaNoticia.value.titulo,
+              contenido: nuevaNoticia.value.contenido,
+            })
+          } else {
+            // Crear
+            await addDoc(collection(db, 'noticias'), {
+              ...nuevaNoticia.value,
+              creadoEn: new Date(),
+            })
+          }
+          resetForm()
+          await fetchNoticias()
+        }
+        
+        const editarNoticia = (noticia) => {
+          editando.value = true
+          noticiaId.value = noticia.id
+          nuevaNoticia.value.titulo = noticia.titulo
+          nuevaNoticia.value.contenido = noticia.contenido
+        }
+        
+        const eliminarNoticia = async (id) => {
+          if (confirm('¿Estás seguro de que quieres eliminar esta noticia?')) {
+            await deleteDoc(doc(db, 'noticias', id))
+            await fetchNoticias()
+          }
+        }
+        
+        const resetForm = () => {
+          editando.value = false
+          noticiaId.value = null
+          nuevaNoticia.value = { titulo: '', contenido: '' }
+        }
+        
+        const cancelarEdicion = () => {
+          resetForm()
+        }
+        </script>
+        
+        <style scoped>
+        /* Estilos para que se vea bien, puedes personalizarlos */
+        .admin-noticias {
+          color: var(--color-texto-principal);
+        }
+        
+        .form-card,
+        .lista-noticias {
+          background-color: var(--color-superficie);
+          padding: 2rem;
+          border-radius: var(--radio-borde);
+          margin-top: 1.5rem;
+        }
+        
+        .form-group {
+          margin-bottom: 1rem;
+        }
+        
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+        
+        input[type='text'],
+        textarea {
+          width: 100%;
+          padding: 0.75rem;
+          background-color: var(--color-fondo);
+          border: 1px solid #444;
+          border-radius: var(--radio-borde);
+          color: var(--color-texto-principal);
+        }
+        
+        .form-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+        
+        button {
+          background-color: var(--color-primario);
+          color: #121212;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: var(--radio-borde);
+          cursor: pointer;
+          font-weight: bold;
+        }
+        
+        .table-container {
+          overflow-x: auto; /* Para que la tabla sea responsive en móviles */
+        }
+        
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        th,
+        td {
+          padding: 1rem;
+          border-bottom: 1px solid #444;
+          text-align: left;
+        }
+        
+        th {
+          color: var(--color-primario);
+        }
+        
+        .acciones {
+          display: flex;
+          gap: 0.5rem;
+        }
+        
+        .btn-eliminar {
+          background-color: #c0392b;
+          color: white;
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminPatrocinadoresView.vue
+        --- Contenido del Archivo ---
+        <template>
+          <div class="admin-patrocinadores-view">
+            <header class="view-header">
+              <h1>Gestionar Patrocinadores</h1>
+              <p>Aquí puedes ver los banners activos para ambos formatos.</p>
+            </header>
+        
+            <!-- Sección para Banners Horizontales -->
+            <section class="seccion-patrocinadores">
+              <h2>Banners Horizontales (1500x214 px)</h2>
+              <div v-if="listaPatrocinadoresHorizontales.length > 0" class="tabla-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nombre</th>
+                      <th>Imagen</th>
+                      <th>Enlace</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="patrocinador in listaPatrocinadoresHorizontales" :key="patrocinador.id">
+                      <td>{{ patrocinador.id }}</td>
+                      <td>{{ patrocinador.nombre }}</td>
+                      <td>
+                        <img
+                          :src="patrocinador.imagen"
+                          :alt="patrocinador.nombre"
+                          class="preview-img horizontal"
+                        />
+                      </td>
+                      <td>
+                        <a :href="patrocinador.enlace" target="_blank" rel="noopener noreferrer">Visitar</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else>
+                <p>No hay banners horizontales registrados.</p>
+              </div>
+            </section>
+        
+            <!-- Sección para Banners Verticales -->
+            <section class="seccion-patrocinadores">
+              <h2>Banners Verticales (214x1500 px)</h2>
+              <div v-if="listaPatrocinadoresVerticales.length > 0" class="tabla-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nombre</th>
+                      <th>Imagen</th>
+                      <th>Enlace</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="patrocinador in listaPatrocinadoresVerticales" :key="patrocinador.id">
+                      <td>{{ patrocinador.id }}</td>
+                      <td>{{ patrocinador.nombre }}</td>
+                      <td>
+                        <img
+                          :src="patrocinador.imagen"
+                          :alt="patrocinador.nombre"
+                          class="preview-img vertical"
+                        />
+                      </td>
+                      <td>
+                        <a :href="patrocinador.enlace" target="_blank" rel="noopener noreferrer">Visitar</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else>
+                <p>No hay banners verticales registrados.</p>
+              </div>
+            </section>
+          </div>
+        </template>
+        
+        <script setup>
+        // --- CAMBIO 1: Se importan las dos listas nuevas ---
+        // Eliminamos la importación antigua y traemos las dos listas separadas.
+        import { listaPatrocinadoresHorizontales } from '@/data/patrocinadoresHorizontal.js'
+        import { listaPatrocinadoresVerticales } from '@/data/patrocinadoresVertical.js'
+        
+        // No necesitamos más lógica aquí por ahora, ya que los datos son estáticos.
+        // En el futuro, aquí irían las funciones para añadir, editar o eliminar patrocinadores.
+        </script>
+        
+        <style scoped>
+        .admin-patrocinadores-view {
+          padding: 2rem;
+        }
+        
+        .view-header {
+          margin-bottom: 2.5rem;
+          border-bottom: 1px solid var(--color-borde);
+          padding-bottom: 1.5rem;
+        }
+        
+        .view-header h1 {
+          font-size: 2.2rem;
+          color: var(--color-primario);
+        }
+        
+        .view-header p {
+          color: var(--color-texto-secundario);
+          font-size: 1.1rem;
+        }
+        
+        .seccion-patrocinadores {
+          margin-bottom: 3rem;
+        }
+        
+        .seccion-patrocinadores h2 {
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          color: var(--color-texto-principal);
+        }
+        
+        .tabla-container {
+          overflow-x: auto; /* Para que la tabla sea responsive en pantallas pequeñas */
+        }
+        
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background-color: var(--color-superficie);
+        }
+        
+        th,
+        td {
+          padding: 12px 15px;
+          text-align: left;
+          border-bottom: 1px solid var(--color-borde);
+        }
+        
+        th {
+          background-color: var(--color-fondo);
+          color: var(--color-texto-secundario);
+          font-weight: bold;
+          text-transform: uppercase;
+          font-size: 0.8rem;
+        }
+        
+        tr:last-child td {
+          border-bottom: none;
+        }
+        
+        .preview-img {
+          display: block;
+          object-fit: cover;
+          border-radius: 4px;
+        }
+        
+        .preview-img.horizontal {
+          width: 150px;
+          height: auto;
+        }
+        
+        .preview-img.vertical {
+          width: 50px;
+          height: auto;
+        }
+        
+        a {
+          color: var(--color-primario);
+          font-weight: bold;
+        }
+        
+        p {
+          background-color: var(--color-superficie);
+          padding: 1rem;
+          border-radius: var(--radio-borde);
+          border: 1px solid var(--color-borde);
+        }
+        </style>
+        --- Fin del Contenido ---
+
+      📄 AdminVersionesView.vue
+        --- Contenido del Archivo ---
+        <!-- src/views/admin/AdminVersionesView.vue -->
+        <template>
+          <div class="admin-versiones">
+            <h1>Gestión de Versiones del Parche</h1>
+        
+            <form @submit.prevent="guardarVersion" class="form-card">
+              <h2>Publicar Nueva Versión</h2>
+        
+              <div class="form-group">
+                <label for="nombreVersion">Nombre de la Versión (ej: v1.0, v1.1 Hotfix)</label>
+                <input type="text" v-model="nuevaVersion.nombre" id="nombreVersion" required />
+              </div>
+        
+              <div class="form-group">
+                <label for="enlaceDescarga">Enlace de Descarga (MediaFire, Google Drive, etc.)</label>
+                <input
+                  type="url"
+                  v-model="nuevaVersion.enlace"
+                  id="enlaceDescarga"
+                  placeholder="https://..."
+                  required
+                />
+              </div>
+        
+              <div class="form-group">
+                <label for="changelog">Notas de la Versión / Changelog (una novedad por línea)</label>
+                <textarea
+                  v-model="nuevaVersion.changelog"
+                  id="changelog"
+                  rows="6"
+                  placeholder="Añadida la Sub-15.&#10;Corregidos los kits de Racing de Balcarce.&#10;Actualizadas las stats de los delanteros."
+                  required
+                ></textarea>
+              </div>
+        
+              <button type="submit">Publicar Versión</button>
+            </form>
+        
+            <div class="lista-versiones">
+              <h2>Versiones Publicadas</h2>
+              <div v-if="cargando">Cargando...</div>
+              <div v-else-if="versiones.length === 0">No hay versiones publicadas.</div>
+              <ul v-else>
+                <li v-for="version in versiones" :key="version.id">
+                  <div class="version-info">
+                    <h3>{{ version.nombre }}</h3>
+                    <small>{{ new Date(version.fechaPublicacion.seconds * 1000).toLocaleString() }}</small>
+                  </div>
+                  <button @click="eliminarVersion(version.id)" class="btn-eliminar">Eliminar</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </template>
+        
+        <script setup>
+        import { ref, onMounted } from 'vue'
+        import { db } from '@/firebase/config'
+        import {
+          collection,
+          addDoc,
+          getDocs,
+          deleteDoc,
+          doc,
+          query,
+          orderBy,
+          serverTimestamp,
+        } from 'firebase/firestore'
+        
+        const nuevaVersion = ref({
+          nombre: '',
+          enlace: '',
+          changelog: '',
+        })
+        const versiones = ref([])
+        const cargando = ref(true)
+        
+        const fetchVersiones = async () => {
+          cargando.value = true
+          const q = query(collection(db, 'versiones'), orderBy('fechaPublicacion', 'desc'))
+          const querySnapshot = await getDocs(q)
+          versiones.value = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          cargando.value = false
+        }
+        
+        onMounted(fetchVersiones)
+        
+        const guardarVersion = async () => {
+          if (!nuevaVersion.value.nombre || !nuevaVersion.value.enlace || !nuevaVersion.value.changelog) {
+            alert('Por favor, completa todos los campos.')
+            return
+          }
+          try {
+            await addDoc(collection(db, 'versiones'), {
+              nombre: nuevaVersion.value.nombre,
+              enlace: nuevaVersion.value.enlace,
+              // Guardamos el changelog como un array, dividiendo por saltos de línea
+              changelog: nuevaVersion.value.changelog.split('\n'),
+              fechaPublicacion: serverTimestamp(), // Firebase pone la fecha del servidor
+            })
+        
+            nuevaVersion.value = { nombre: '', enlace: '', changelog: '' }
+            await fetchVersiones()
+            alert('¡Versión publicada con éxito!')
+          } catch (error) {
+            console.error('Error al publicar la versión:', error)
+            alert('Ocurrió un error.')
+          }
+        }
+        
+        const eliminarVersion = async (id) => {
+          if (!confirm('¿Estás seguro de que quieres eliminar esta versión?')) return
+          try {
+            await deleteDoc(doc(db, 'versiones', id))
+            await fetchVersiones()
+            alert('Versión eliminada.')
+          } catch (error) {
+            console.error('Error al eliminar:', error)
+            alert('Ocurrió un error al eliminar.')
+          }
+        }
+        </script>
+        
+        <style scoped>
+        /* Estilos para el panel de admin, consistentes con los demás */
+        .admin-versiones {
+          color: var(--color-texto-principal);
+        }
+        .form-card,
+        .lista-versiones {
+          background-color: var(--color-superficie);
+          padding: 2rem;
+          border-radius: var(--radio-borde);
+          margin-top: 1.5rem;
+        }
+        .form-group {
+          margin-bottom: 1rem;
+        }
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+        input[type='text'],
+        input[type='url'],
+        textarea {
+          width: 100%;
+          padding: 0.75rem;
+          background-color: var(--color-fondo);
+          border: 1px solid #444;
+          border-radius: var(--radio-borde);
+          color: var(--color-texto-principal);
+        }
+        button {
+          background-color: var(--color-primario);
+          color: #121212;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: var(--radio-borde);
+          cursor: pointer;
+          font-weight: bold;
+        }
+        ul {
+          list-style: none;
+          padding: 0;
+        }
+        li {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          border-bottom: 1px solid #333;
+        }
+        li:last-child {
+          border-bottom: none;
+        }
+        .version-info h3 {
+          margin: 0;
+        }
+        .version-info small {
+          color: var(--color-texto-secundario);
+        }
+        .btn-eliminar {
+          background-color: #c0392b;
+          color: white;
+        }
+        </style>
+        --- Fin del Contenido ---
+

@@ -1,15 +1,13 @@
+<!-- src/views/admin/AdminDashboardView.vue -->
 <script setup>
 import { ref } from 'vue'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-// Lógica para el formulario de encuestas
+// --- Lógica para el formulario de encuestas (existente) ---
 const nuevaEncuestaPregunta = ref('')
-const nuevaEncuestaOpciones = ref([
-  { texto: '' },
-  { texto: '' }
-])
-const mensajeExito = ref('')
+const nuevaEncuestaOpciones = ref([{ texto: '' }, { texto: '' }])
+const encuestaExito = ref('')
 
 const agregarOpcion = () => {
   nuevaEncuestaOpciones.value.push({ texto: '' })
@@ -20,63 +18,141 @@ const crearEncuesta = async () => {
     alert('La pregunta no puede estar vacía.')
     return
   }
-
   const opcionesValidas = nuevaEncuestaOpciones.value
-    .map(op => ({ texto: op.texto.trim(), votos: 0 }))
-    .filter(op => op.texto !== '')
+    .map((op) => ({ texto: op.texto.trim(), votos: 0 }))
+    .filter((op) => op.texto !== '')
 
   if (opcionesValidas.length < 2) {
     alert('Debe haber al menos dos opciones válidas.')
     return
   }
-
   try {
-    // Añadimos el nuevo documento a la colección 'encuestas'
     await addDoc(collection(db, 'encuestas'), {
       pregunta: nuevaEncuestaPregunta.value,
       opciones: opcionesValidas,
-      estaActiva: true, // La marcamos como activa por defecto
-      fechaCreacion: serverTimestamp()
+      estaActiva: true,
+      fechaCreacion: serverTimestamp(),
     })
-
-    mensajeExito.value = '¡Encuesta creada con éxito!'
-    // Limpiamos el formulario
+    encuestaExito.value = '¡Encuesta creada con éxito!'
     nuevaEncuestaPregunta.value = ''
     nuevaEncuestaOpciones.value = [{ texto: '' }, { texto: '' }]
-    
-    setTimeout(() => mensajeExito.value = '', 3000) // Ocultar mensaje después de 3s
-
+    setTimeout(() => (encuestaExito.value = ''), 3000)
   } catch (error) {
-    console.error("Error al crear la encuesta:", error);
+    console.error('Error al crear la encuesta:', error)
     alert('Hubo un error al crear la encuesta.')
   }
 }
+
+// --- INICIO: Nueva Lógica para el formulario de descargas ---
+const nuevaDescarga = ref({
+  titulo: '',
+  descripcion: '',
+  enlace: '',
+})
+const descargaExito = ref('')
+
+const crearDescarga = async () => {
+  // Validación simple
+  if (
+    !nuevaDescarga.value.titulo.trim() ||
+    !nuevaDescarga.value.descripcion.trim() ||
+    !nuevaDescarga.value.enlace.trim()
+  ) {
+    alert('Por favor, completa todos los campos para la descarga.')
+    return
+  }
+
+  try {
+    // Añadimos el nuevo documento a la colección 'descargasLinks'
+    await addDoc(collection(db, 'descargasLinks'), {
+      titulo: nuevaDescarga.value.titulo,
+      descripcion: nuevaDescarga.value.descripcion,
+      enlace: nuevaDescarga.value.enlace,
+      fechaPublicacion: serverTimestamp(), // Firebase se encarga de la fecha
+    })
+
+    descargaExito.value = '¡Link de descarga publicado con éxito!'
+    // Limpiamos el formulario
+    nuevaDescarga.value = { titulo: '', descripcion: '', enlace: '' }
+    setTimeout(() => (descargaExito.value = ''), 3000)
+  } catch (error) {
+    console.error('Error al crear la descarga:', error)
+    alert('Hubo un error al publicar la descarga.')
+  }
+}
+// --- FIN: Nueva Lógica ---
 </script>
 
 <template>
   <div class="dashboard">
     <h1>Dashboard Principal</h1>
     <p>Desde aquí puedes ver un resumen general y realizar acciones rápidas.</p>
-    
+
+    <!-- INICIO: Nuevo widget para publicar descargas -->
+    <section class="widget">
+      <h2>Publicar Link de Descarga Adicional</h2>
+      <form @submit.prevent="crearDescarga">
+        <div class="form-group">
+          <label for="tituloDescarga">Título</label>
+          <input
+            type="text"
+            v-model="nuevaDescarga.titulo"
+            id="tituloDescarga"
+            placeholder="Ej: Pack de Estadios Sudamericanos"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="descripcionDescarga">Descripción</label>
+          <textarea
+            v-model="nuevaDescarga.descripcion"
+            id="descripcionDescarga"
+            rows="3"
+            placeholder="Breve descripción del contenido del archivo."
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="enlaceDescarga">Enlace de Descarga (URL)</label>
+          <input
+            type="url"
+            v-model="nuevaDescarga.enlace"
+            id="enlaceDescarga"
+            placeholder="https://www.mediafire.com/..."
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-principal">Publicar Descarga</button>
+      </form>
+      <p v-if="descargaExito" class="mensaje-exito">{{ descargaExito }}</p>
+    </section>
+    <!-- FIN: Nuevo widget -->
+
     <section class="widget">
       <h2>Crear Nueva Encuesta</h2>
       <form @submit.prevent="crearEncuesta">
         <div class="form-group">
           <label for="pregunta">Pregunta de la Encuesta</label>
-          <input type="text" v-model="nuevaEncuestaPregunta" id="pregunta" placeholder="Ej: ¿Quién fue la figura de la fecha?">
+          <input
+            type="text"
+            v-model="nuevaEncuestaPregunta"
+            id="pregunta"
+            placeholder="Ej: ¿Quién fue la figura de la fecha?"
+          />
         </div>
-
         <div class="form-group">
           <label>Opciones</label>
           <div v-for="(opcion, index) in nuevaEncuestaOpciones" :key="index" class="opcion-input">
-            <input type="text" v-model="opcion.texto" :placeholder="`Opción ${index + 1}`">
+            <input type="text" v-model="opcion.texto" :placeholder="`Opción ${index + 1}`" />
           </div>
           <button type="button" @click="agregarOpcion" class="btn-secundario">Añadir Opción</button>
         </div>
-        
         <button type="submit" class="btn-principal">Crear Encuesta</button>
       </form>
-      <p v-if="mensajeExito" class="mensaje-exito">{{ mensajeExito }}</p>
+      <p v-if="encuestaExito" class="mensaje-exito">{{ encuestaExito }}</p>
     </section>
   </div>
 </template>
@@ -96,6 +172,7 @@ const crearEncuesta = async () => {
   background-color: var(--color-superficie);
   padding: 2rem;
   border-radius: var(--radio-borde);
+  margin-bottom: 2rem; /* Espacio entre widgets */
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -105,7 +182,9 @@ label {
   margin-bottom: 0.5rem;
   font-weight: bold;
 }
-input {
+input[type='text'],
+input[type='url'],
+textarea {
   width: 100%;
   padding: 0.8rem;
   background-color: var(--color-fondo);
@@ -142,5 +221,6 @@ input {
   color: var(--color-primario);
   margin-top: 1rem;
   text-align: center;
+  font-weight: bold;
 }
 </style>

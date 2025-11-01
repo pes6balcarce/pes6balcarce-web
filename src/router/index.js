@@ -9,7 +9,8 @@ import HomeView from '../views/HomeView.vue'
 import NoticiasView from '../views/NoticiasView.vue'
 import NoticiaDetalleView from '../views/NoticiaDetalleView.vue'
 import DescargasView from '@/views/DescargasView.vue'
-import HistorialVersionesView from '@/views/HistorialVersionesView.vue' // <-- IMPORTAR NUEVA VISTA
+import HistorialVersionesView from '@/views/HistorialVersionesView.vue'
+import LinksDescargaView from '@/views/LinksDescargaView.vue' // <-- 1. IMPORTAR LA NUEVA VISTA
 
 // Vistas de Autenticación y Perfil de Usuario
 import RegistroView from '@/views/RegistroView.vue'
@@ -23,8 +24,8 @@ import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
 import AdminEncuestasView from '@/views/admin/AdminEncuestasView.vue'
 import AdminJugadoresView from '@/views/admin/AdminJugadoresView.vue'
 import AdminNoticiasView from '@/views/admin/AdminNoticiasView.vue'
-import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue' // <-- ESTA ES LA LÍNEA QUE FALTABA
-import AdminVersionesView from '@/views/admin/AdminVersionesView.vue' // <-- Importación para la nueva vista de admin
+import AdminPatrocinadoresView from '@/views/admin/AdminPatrocinadoresView.vue'
+import AdminVersionesView from '@/views/admin/AdminVersionesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,11 @@ const router = createRouter({
     // --- Rutas Públicas y de Usuario ---
     { path: '/', name: 'home', component: HomeView },
     { path: '/descargas', name: 'descargas', component: DescargasView },
+    {
+      path: '/links-descarga', // <-- 2. AÑADIR LA NUEVA RUTA
+      name: 'links-descarga',
+      component: LinksDescargaView,
+    },
     {
       path: '/descargas/historial',
       name: 'historial-versiones',
