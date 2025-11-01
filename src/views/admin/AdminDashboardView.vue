@@ -4,6 +4,40 @@ import { ref } from 'vue'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
+// --- INICIO: Nueva Lógica para el formulario de VERSIONES DEL PARCHE ---
+const nuevaVersion = ref({
+  nombre: '',
+  enlace: '',
+  changelog: '',
+})
+const versionExito = ref('')
+
+const guardarVersion = async () => {
+  if (!nuevaVersion.value.nombre || !nuevaVersion.value.enlace || !nuevaVersion.value.changelog) {
+    alert('Por favor, completa todos los campos para publicar la versión.')
+    return
+  }
+  try {
+    // Apuntamos a la colección 'versiones'
+    await addDoc(collection(db, 'versiones'), {
+      nombre: nuevaVersion.value.nombre,
+      enlace: nuevaVersion.value.enlace,
+      // Guardamos el changelog como un array, dividiendo por saltos de línea
+      changelog: nuevaVersion.value.changelog.split('\n').filter((line) => line.trim() !== ''),
+      fechaPublicacion: serverTimestamp(), // Firebase pone la fecha del servidor
+    })
+
+    versionExito.value = '¡Nueva versión del parche publicada con éxito!'
+    // Limpiamos el formulario
+    nuevaVersion.value = { nombre: '', enlace: '', changelog: '' }
+    setTimeout(() => (versionExito.value = ''), 4000)
+  } catch (error) {
+    console.error('Error al publicar la versión:', error)
+    alert('Ocurrió un error al publicar la versión.')
+  }
+}
+// --- FIN: Nueva Lógica de Versiones ---
+
 // --- Lógica para el formulario de encuestas (existente) ---
 const nuevaEncuestaPregunta = ref('')
 const nuevaEncuestaOpciones = ref([{ texto: '' }, { texto: '' }])
@@ -42,45 +76,6 @@ const crearEncuesta = async () => {
     alert('Hubo un error al crear la encuesta.')
   }
 }
-
-// --- INICIO: Nueva Lógica para el formulario de descargas ---
-const nuevaDescarga = ref({
-  titulo: '',
-  descripcion: '',
-  enlace: '',
-})
-const descargaExito = ref('')
-
-const crearDescarga = async () => {
-  // Validación simple
-  if (
-    !nuevaDescarga.value.titulo.trim() ||
-    !nuevaDescarga.value.descripcion.trim() ||
-    !nuevaDescarga.value.enlace.trim()
-  ) {
-    alert('Por favor, completa todos los campos para la descarga.')
-    return
-  }
-
-  try {
-    // Añadimos el nuevo documento a la colección 'descargasLinks'
-    await addDoc(collection(db, 'descargasLinks'), {
-      titulo: nuevaDescarga.value.titulo,
-      descripcion: nuevaDescarga.value.descripcion,
-      enlace: nuevaDescarga.value.enlace,
-      fechaPublicacion: serverTimestamp(), // Firebase se encarga de la fecha
-    })
-
-    descargaExito.value = '¡Link de descarga publicado con éxito!'
-    // Limpiamos el formulario
-    nuevaDescarga.value = { titulo: '', descripcion: '', enlace: '' }
-    setTimeout(() => (descargaExito.value = ''), 3000)
-  } catch (error) {
-    console.error('Error al crear la descarga:', error)
-    alert('Hubo un error al publicar la descarga.')
-  }
-}
-// --- FIN: Nueva Lógica ---
 </script>
 
 <template>
@@ -88,48 +83,42 @@ const crearDescarga = async () => {
     <h1>Dashboard Principal</h1>
     <p>Desde aquí puedes ver un resumen general y realizar acciones rápidas.</p>
 
-    <!-- INICIO: Nuevo widget para publicar descargas -->
+    <!-- INICIO: Widget para publicar una nueva versión del parche -->
     <section class="widget">
-      <h2>Publicar Link de Descarga Adicional</h2>
-      <form @submit.prevent="crearDescarga">
+      <h2>Publicar Nueva Versión del Parche</h2>
+      <form @submit.prevent="guardarVersion">
         <div class="form-group">
-          <label for="tituloDescarga">Título</label>
+          <label for="nombreVersion">Nombre de la Versión (ej: v1.0, v1.1 Hotfix)</label>
+          <input type="text" v-model="nuevaVersion.nombre" id="nombreVersion" required />
+        </div>
+
+        <div class="form-group">
+          <label for="enlaceDescarga">Enlace de Descarga (MediaFire, Google Drive, etc.)</label>
           <input
-            type="text"
-            v-model="nuevaDescarga.titulo"
-            id="tituloDescarga"
-            placeholder="Ej: Pack de Estadios Sudamericanos"
+            type="url"
+            v-model="nuevaVersion.enlace"
+            id="enlaceDescarga"
+            placeholder="https://..."
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="descripcionDescarga">Descripción</label>
+          <label for="changelog">Notas de la Versión / Changelog (una novedad por línea)</label>
           <textarea
-            v-model="nuevaDescarga.descripcion"
-            id="descripcionDescarga"
-            rows="3"
-            placeholder="Breve descripción del contenido del archivo."
+            v-model="nuevaVersion.changelog"
+            id="changelog"
+            rows="6"
+            placeholder="Añadida la Sub-15.&#10;Corregidos los kits de Racing de Balcarce.&#10;Actualizadas las stats de los delanteros."
             required
           ></textarea>
         </div>
 
-        <div class="form-group">
-          <label for="enlaceDescarga">Enlace de Descarga (URL)</label>
-          <input
-            type="url"
-            v-model="nuevaDescarga.enlace"
-            id="enlaceDescarga"
-            placeholder="https://www.mediafire.com/..."
-            required
-          />
-        </div>
-
-        <button type="submit" class="btn-principal">Publicar Descarga</button>
+        <button type="submit" class="btn-principal">Publicar Versión</button>
       </form>
-      <p v-if="descargaExito" class="mensaje-exito">{{ descargaExito }}</p>
+      <p v-if="versionExito" class="mensaje-exito">{{ versionExito }}</p>
     </section>
-    <!-- FIN: Nuevo widget -->
+    <!-- FIN: Widget de Versiones -->
 
     <section class="widget">
       <h2>Crear Nueva Encuesta</h2>
@@ -143,6 +132,7 @@ const crearDescarga = async () => {
             placeholder="Ej: ¿Quién fue la figura de la fecha?"
           />
         </div>
+
         <div class="form-group">
           <label>Opciones</label>
           <div v-for="(opcion, index) in nuevaEncuestaOpciones" :key="index" class="opcion-input">
@@ -150,6 +140,7 @@ const crearDescarga = async () => {
           </div>
           <button type="button" @click="agregarOpcion" class="btn-secundario">Añadir Opción</button>
         </div>
+
         <button type="submit" class="btn-principal">Crear Encuesta</button>
       </form>
       <p v-if="encuestaExito" class="mensaje-exito">{{ encuestaExito }}</p>
@@ -222,5 +213,15 @@ textarea {
   margin-top: 1rem;
   text-align: center;
   font-weight: bold;
+}
+
+/* Media Query para mejorar la vista en móviles */
+@media (max-width: 768px) {
+  .widget {
+    padding: 1.5rem;
+  }
+  .dashboard h1 {
+    font-size: 1.8rem;
+  }
 }
 </style>
